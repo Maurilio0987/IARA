@@ -22,6 +22,7 @@ def login_required(f):
 
 @app.route("/")
 def index():
+    if session.get("email"): return redirect(url_for("dashboard"))
     return render_template("index.html")
 
 
@@ -60,14 +61,11 @@ def ajuda():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return f"bem vindo {session['email']} <br><br> <a href='logout'>logout</a>"
+    return f"<h1>bem vindo {session['email']}</h1> <br><br> <a href='logout'>logout</a>"
     
-
     
-
+#app.run(debug=True, host="localhost", port=80)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-          
-#app.run(debug=True, host="localhost", port=80)
