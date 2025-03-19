@@ -63,13 +63,11 @@ def dashboard():
     return f"bem vindo {session['email']} <br><br> <a href='logout'>logout</a>"
     
 
-
-
-
-
     
-app.run(debug=True, host="localhost", port=80)
 
-#if __name__ == "__main__":
-#    port = int(os.environ.get("PORT", 5000))
-#    app.run(host="0.0.0.0", port=port)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+          
+#app.run(debug=True, host="localhost", port=80)
