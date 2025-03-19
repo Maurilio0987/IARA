@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IARA - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./static/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="logo-container">
+            <div class="logo">IARA</div>
+            <div class="subtitle">Irrigação Agrícola com Resposta Automática</div>
+        </div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="sobre">Sobre</a></li>
+                <li><a href="contato">Contato</a></li>
+                <li><a href="ajuda">Ajuda</a></li>
+            </ul>
+        </nav>
+        <button class="navbar-toggler" onclick="toggleSidebar()">☰</button>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+        <ul>
+			<li><a>___</a></li>
+            <li><a href="sobre">Sobre</a></li>
+            <li><a href="contato">Contato</a></li>
+            <li><a href="ajuda">Ajuda</a></li>
+        </ul>
+    </div>
+
+    <div class="login-container">
+        <h2>Bem-vindo(a) ao sistema IARA</h2>
+        <form action="login" method="POST">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Digite seu email" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha:</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Digite sua senha" required>
+                <a href="#" class="forgot-password">Esqueci minha senha</a>
+            </div>
+
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
+        <p class="create-account">Não tem conta? <a href="#">Crie uma</a></p>
+    </div>
+	
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="./static/js/script.js"></script>
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            if (sidebar.style.left === "0px") {
+                sidebar.style.left = "-220px";
+            } else {
+                sidebar.style.left = "0px";
+            }
+        }
+    </script>
+
+</body>
+</html>
