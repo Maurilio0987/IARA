@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from functools import wraps
 import os
 
@@ -10,13 +10,14 @@ app.secret_key = 'chave_secreta'
 logins = {"admin@admin": "1234",
           "flaviomaurilio0@gmail.com": "4321"}
 
+banco_de_dados = {"umidade": 0}
 
 def login_required(f):
-    @wraps(f)  # mantém o nome e docstring da função original (boa prática)
+    @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'email' not in session:  # verifica se o usuário está na session (se está logado)
-            return redirect(url_for('index'))  # se não estiver, redireciona para /login
-        return f(*args, **kwargs)  # se estiver, executa a função da rota normalmente
+        if 'email' not in session:
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
     return decorated_function
 
 
@@ -63,7 +64,18 @@ def ajuda():
 def dashboard():
     return render_template("dashboard.html")
     
+
+@app.route("/dados")
+def dados():
+    return jsonify(banco_de_dados)
     
+    
+@app.route("/umidade", methods=["POST"])
+def umidade():
+    banco_de_dados["umidade"] = request.get_json()["umidade"]
+    return {"status": "recebido"}, 200
+
+
 #app.run(debug=True, host="localhost", port=80)
 
 if __name__ == "__main__":

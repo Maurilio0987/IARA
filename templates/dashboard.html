@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IARA - Irrigação Agrícola com Resposta Automática</title>
+	<link rel="icon" href="./static/imgs/icone.ico" type="image/x-icon">
+	<link rel="icon" href="./static/imgs/icone.png" type="image/png">
+	
+	
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -183,9 +186,9 @@
         </div>
         <nav class="navbar">
             <ul>
-                <li><a href="#">Sobre</a></li>
-                <li><a href="#">Contato</a></li>
-                <li><a href="#">Ajuda</a></li>
+                <li><a href="sobre">Sobre</a></li>
+                <li><a href="contato">Contato</a></li>
+                <li><a href="ajuda">Ajuda</a></li>
             </ul>
         </nav>
         <button class="navbar-toggler" onclick="toggleSidebar()">☰</button>
@@ -206,9 +209,9 @@
         <div class="box">
             <h3>Umidade Atual</h3>
             <div class="humidity-bar">
-                <span class="green" style="width: 50%;"></span>
+                <span id="barra_de_umidade" class="green" style="width: 50%;"></span>
             </div>
-            <p class="data"><span>50%</span> de umidade no solo</p>
+            <p class="data"><span id="umidade">50%</span> de umidade no solo</p>
             <div class="graph"></div>
         </div>
 
@@ -239,7 +242,9 @@
             <div class="graph" id="historico-meteorologico"></div>
         </div>
     </div>
-
+	
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="./static/js/script.js"></script>
     <script>
         function toggleGraph(tipo) {
             const graph = document.getElementById("historico-umidade");
