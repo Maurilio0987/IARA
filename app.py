@@ -61,7 +61,7 @@ def ajuda():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return f"<h1>bem vindo {session['email']}</h1> <br><br> <a href='logout'>logout</a>"
+    return render_template("dashboard.html")
     
     
 #app.run(debug=True, host="localhost", port=80)
