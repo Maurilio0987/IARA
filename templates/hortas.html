@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Hortas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #hortaForm {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .horta-card {
+            display: inline-block;
+            width: 200px;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .close-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Minhas Hortas</h1>
+
+    <button onclick="mostrarFormulario()">+</button>
+
+    <div id="overlay" onclick="fecharFormulario()"></div>
+
+    <div id="hortaForm">
+        <button class="close-btn" onclick="fecharFormulario()">X</button>
+        <h2>Cadastrar Nova Horta</h2>
+        <label>Tamanho (m²):</label>
+        <input type="number" id="tamanho"><br><br>
+		
+		<label for="cultura">Cultura:</label>
+        <select id="cultura" name="cultura" required>
+			{% for cultura in culturas %}
+				<option value="{{ cultura[0] }}">{{ cultura[1] }}</option>
+			{% endfor %}
+        </select><br><br>
+
+        <label for="solo">Tipo de Solo:</label>
+        <select id="solo" name="solo" required>
+            {% for solo in solos %}
+				<option value="{{ solo[0] }}">{{ solo[1] }}</option>
+			{% endfor %}
+        </select><br><br>
+		
+		<label for="tempo">Tempo (dias):</label>
+		<input type="number" id="tempo" min="0"><br><br>
+
+        <button id="cadastrar" onclick="cadastrarHorta()">Cadastrar</button>
+    </div>
+
+    <h2>Hortas Cadastradas</h2>
+    <div id="hortasLista">
+		<div class="horta-card">
+			<strong>Tamanho:</strong> 3 m² <br>
+			<strong>Cultura:</strong> Coentro <br>
+			<strong>Solo:</strong> Arenoso
+		</div>
+	</div>
+	
+
+    <script src="./static/js/hortas.js"></script>
+
+</body>
+</html>
