@@ -207,12 +207,9 @@ class DatabaseManager:
             if tempo <= tempo_acumulado:
                 return estagio_id
 
-        return None
+        return estagio_id
 
 
-
-
-        
     def adicionar_horta(self, usuario, tamanho, cultura, solo, tempo):
         estagio_id = self.estagio(cultura, tempo)
         if estagio_id != None:
@@ -220,8 +217,44 @@ class DatabaseManager:
                             ({usuario}, {tamanho}, {tempo}, {solo}, {estagio_id})""")
             return True
         return False
-        
-        
+    
+    
+    def atualizar_hortas(self):
+        conexao = self.conectar_banco_de_dados()
+        cursor = conexao.cursor()
+
+        # Atualiza o tempo de todas as hortas
+        query_tempo = "UPDATE hortas SET duracao = duracao + 1;"
+        cursor.execute(query_tempo)
+
+        # Seleciona as hortas com o novo tempo atualizado
+        query_hortas = "SELECT id, duracao, estagio_id FROM hortas;"
+        cursor.execute(query_hortas)
+        hortas = cursor.fetchall()
+
+        for horta_id, duracao, estagio_id in hortas:
+            # Obtém a cultura associada ao estágio atual
+            query_cultura = "SELECT cultura_id FROM estagios WHERE id = %s;"
+            cursor.execute(query_cultura, (estagio_id,))
+            cultura_id = cursor.fetchone()
+
+            if not cultura_id:
+                continue
+
+            cultura_id = cultura_id[0]
+
+            # Obtém o novo estágio com base no tempo atualizado
+            novo_estagio_id = self.estagio(cultura_id, duracao)
+
+            # Atualiza o estágio se ele mudou
+            if novo_estagio_id and novo_estagio_id != estagio_id:
+                query_update = "UPDATE hortas SET estagio_id = %s WHERE id = %s;"
+                cursor.execute(query_update, (novo_estagio_id, horta_id))
+
+        cursor.close()
+        conexao.close()
+
+    
     def imprimir_tabela(self, nome_tabela):
         query = f"SELECT * FROM {nome_tabela};"
         
@@ -244,5 +277,5 @@ class DatabaseManager:
 if __name__ == "__main__":
     db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
     db = DatabaseManager(db_url)
-    db.executar("drop table hortas")
+    db.atualizar_hortas()
     

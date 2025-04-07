@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from functools import wraps
 import os
 from banco_de_dados import DatabaseManager, sha256
-
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 
@@ -13,6 +13,11 @@ app.secret_key = 'chave_secreta'
 
 db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
 db = DatabaseManager(db_url)
+
+
+#scheduler = BackgroundScheduler()
+#scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0)
+#scheduler.start()
 
 
 @app.route("/sobre")
