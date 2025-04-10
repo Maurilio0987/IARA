@@ -115,6 +115,12 @@ def atualizar_hortas():
     return jsonify(db.hortas(session["email"]))
 
 
+@app.route("/esp32/estado/<chave>")
+def estado(chave):
+    estado = {"estado": db.estado(chave)}
+    return jsonify(estado)
+
+
 #@app.route("/dados")
 #def dados():
 #    return jsonify(banco_de_dados)

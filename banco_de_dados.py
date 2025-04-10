@@ -65,6 +65,7 @@ class DatabaseManager:
             solo_id INT NOT NULL,
             estagio_id INT NOT NULL,
             chave VARCHAR(36) UNIQUE NOT NULL DEFAULT (UUID()),
+            estado ENUM('Ligado', "Desligado") NOT NULL,
 
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
             FOREIGN KEY (solo_id) REFERENCES solos(id),
@@ -213,8 +214,8 @@ class DatabaseManager:
     def adicionar_horta(self, usuario, tamanho, cultura, solo, tempo):
         estagio_id = self.estagio(cultura, tempo)
         if estagio_id != None:
-            self.executar(f"""INSERT INTO hortas (usuario_id, tamanho, duracao, solo_id, estagio_id) VALUES 
-                            ({usuario}, {tamanho}, {tempo}, {solo}, {estagio_id})""")
+            self.executar(f"""INSERT INTO hortas (usuario_id, tamanho, duracao, solo_id, estagio_id, estado) VALUES 
+                            ({usuario}, {tamanho}, {tempo}, {solo}, {estagio_id}, 'Desligado')""")
             return True
         return False
     
@@ -253,8 +254,23 @@ class DatabaseManager:
 
         cursor.close()
         conexao.close()
-
     
+    def estado_horta(self, chave_horta):
+        conexao = self.conectar_banco_de_dados()
+        cursor = conexao.cursor()
+        
+        query = "SELECT estado FROM hortas WHERE chave = %s;"
+        cursor.execute(query, (chave_horta))
+        estado = cursor.fetchone()
+        
+        cursor.close()
+        conexao.close()
+        
+        if estado == "Ligado":
+            return True
+        return False
+        
+        
     def imprimir_tabela(self, nome_tabela):
         query = f"SELECT * FROM {nome_tabela};"
         
@@ -277,5 +293,4 @@ class DatabaseManager:
 if __name__ == "__main__":
     db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
     db = DatabaseManager(db_url)
-    db.atualizar_hortas()
     
