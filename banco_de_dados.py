@@ -271,20 +271,40 @@ class DatabaseManager:
         return False
         
         
-    def imprimir_tabela(self, nome_tabela):
+    def tabela(self, nome_tabela):
         query = f"SELECT * FROM {nome_tabela};"
         
+        if nome_tabela == "culturas": query = """SELECT 
+                                                    cultura.nome AS cultura,
+                                                    estagio.nome AS estagio,
+                                                    estagio.duracao,
+                                                    estagio.kc,
+                                                    sub.qtd_estagios
+                                                FROM culturas cultura
+                                                JOIN estagios estagio ON cultura.id = estagio.cultura_id
+                                                JOIN (
+                                                    SELECT cultura_id, COUNT(*) AS qtd_estagios
+                                                    FROM estagios
+                                                    GROUP BY cultura_id
+                                                ) sub ON cultura.id = sub.cultura_id
+                                                ORDER BY cultura.nome, estagio.numero_estagio;
+                                                """
+                                        
         conexão = self.conectar_banco_de_dados()
         cursor = conexão.cursor()
         cursor.execute(query)
         
         linhas = cursor.fetchall()
         
-        for linha in linhas:
-            print(linha)
-        
         cursor.close()
         conexão.close()
+        return linhas
+    
+    
+    def adicionar_solo(self, nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica):
+        query = f"""INSERT INTO solos (nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica) VALUES ("{nome}", {capacidade_campo}, {ponto_murcha}, {densidade}, {porosidade}, "{cond_hidraulica}")"""
+        self.executar(query)
+
 
 #db.executar("""INSERT INTO usuarios (email, senha_hash) VALUES ('flaviomaurilio0@gmail.com', '12345')""")
 #db.executar("""INSERT INTO solos (nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica) VALUES ('Arenoso-argiloso', 150, 175, 1.65, 0.35, 'Alta')""")
@@ -293,4 +313,5 @@ class DatabaseManager:
 if __name__ == "__main__":
     db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
     db = DatabaseManager(db_url)
+    db.imprimir_tabela("culturas")
     

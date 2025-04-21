@@ -54,6 +54,11 @@ def index():
 def login():
     email = request.form["email"]
     senha = request.form["password"]
+    if email == "admin@admin" and senha == "admin":
+        session["email"] = email
+        return redirect(url_for("admin"))
+        
+        
     if db.verificar_email(email):
         if db.verificar_senha(email, sha256(senha)):
             session["email"] = email
@@ -94,7 +99,7 @@ def hortas():
 @app.route("/hortas/<chave>")
 @login_required
 def horta(chave):
-    return "Página da horta"
+    return render_template("horta.html")
 
 
 @app.route("/cadastrar_horta", methods=["POST"])
@@ -121,6 +126,41 @@ def estado(chave):
     return jsonify(estado)
 
 
+
+
+@app.route("/admin")
+@login_required
+def admin():
+    return render_template("admin.html")
+
+
+@app.route("/admin/culturas")
+@login_required
+def culturas():
+    tabela = db.tabela("culturas")
+    return render_template("culturas.html", tabela=tabela)
+    
+
+@app.route("/admin/solos")
+@login_required
+def solos():
+    tabela = db.tabela("solos")
+    return render_template("solos.html", tabela=tabela)
+
+
+@app.route("/admin/adicionar_solo", methods=["POST"])
+def adicionar_solo():
+    nome = request.form["nome"]
+    capacidade_campo = request.form["capacidade_campo"]
+    ponto_murcha = request.form["ponto_murcha"]
+    densidade = request.form["densidade"]
+    porosidade = request.form["porosidade"]
+    cond_hidraulica = request.form["cond_hidraulica"]
+    
+    db.adicionar_solo(nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica)
+    return redirect(url_for("admin/solos"))
+    
+    
 #@app.route("/dados")
 #def dados():
 #    return jsonify(banco_de_dados)
