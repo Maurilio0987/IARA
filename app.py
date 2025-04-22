@@ -157,11 +157,12 @@ def estacao():
             if eid in sensor_ids:
                 resultado[sensor_ids[eid]] = sensor.get("state")
 
-        return resultado
+        return jsonify(resultado)
 
     except requests.exceptions.RequestException as e:
         print("Erro ao conectar com o Home Assistant:", e)
-        return {}
+        return jsonify({})
+
 
 @app.route("/admin")
 @login_required
