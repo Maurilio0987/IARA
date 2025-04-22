@@ -1,29 +1,77 @@
-var API_ESTACAO = "";
+const BASE_URL = "SUA_URL_AQUI";
+const TOKEN = "SEU_TOKEN_AQUI";
+
+
+const headers = {
+  "Authorization": `Bearer ${TOKEN}`,
+  "Content-Type": "application/json"
+};
+
+const sensorIds = {
+  "sensor.vento_kmh": "Velocidade do Vento (km/h)",
+  "sensor.direzione_vento": "Direção do Vento",
+  "sensor.precipitacao_mm": "Precipitação (mm)",
+  "sensor.tasmota_am2301_temperature": "Temperatura",
+  "sensor.tasmota_am2301_humidity": "Umidade"
+};
 
 
 
 function atualizar_estacao() {
-	fetch("API_ESTACAO")
-	.then(response => {
-		return response.json(); 
-	})
-	.then(data => {
-		let elemento_temperatura = document.getElementById("temperatura");
-		let elemento_umidade = document.getElementById("umidade");
-		let valor_temperatura = data["temperatura"];
-		let valor_umidade = data["umidade"];
-		
-		elemento_temperatura.innerHTML = `${String(valor_temperatura)}%`;
-		elemento_umidade.innerHTML = `${String(valor_umidade)}%`;
-	})
-	.catch(error => {
-      console.error('Erro:', error);
-   });
+    fetch(BASE_URL, { headers })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Erro na requisição: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+                let vento_kmh, direcao_vento, precipitacao_mm, temperatura, umidade;
+
+                // Percorre os dados
+                data.forEach(sensor => {
+                  switch (sensor.entity_id) {
+                    case "sensor.vento_kmh":
+                      vento_kmh = sensor.state;
+                      break;
+                    case "sensor.direzione_vento":
+                      direcao_vento = sensor.state;
+                      break;
+                    case "sensor.precipitacao_mm":
+                      precipitacao_mm = sensor.state;
+                      break;
+                    case "sensor.tasmota_am2301_temperature":
+                      temperatura = sensor.state;
+                      break;
+                    case "sensor.tasmota_am2301_humidity":
+                      umidade = sensor.state;
+                      break;
+                  }
+                });
+
+                // Exibe os valores
+                console.log("Velocidade do Vento:", vento_kmh);
+                console.log("Direção do Vento:", direcao_vento);
+                console.log("Precipitação:", precipitacao_mm);
+                console.log("Temperatura:", temperatura);
+                console.log("Umidade:", umidade);
+
+
+                let elemento_temperatura = document.getElementById("temperatura");
+                let elemento_umidade = document.getElementById("umidade");
+
+                elemento_temperatura.innerHTML = `${String(temperatura)}%`;
+                elemento_umidade.innerHTML = `${String(umidade)}%`;
+                // Você pode usar essas variáveis onde quiser agora
+              })
+              .catch(error => {
+                console.error("Erro ao obter dados:", error);
+              });
 }
 
 
 function atualizar_tudo() {
-	atualizar_umidade()
+	atualizar_estacao()
 }
 
 
@@ -35,5 +83,5 @@ function umidade(valor) {
 	})
 }
 
-//setInterval(atualizar_tudo, 2000);
+setInterval(atualizar_tudo, 2000);
 
