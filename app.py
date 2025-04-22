@@ -3,7 +3,7 @@ from functools import wraps
 import os
 from banco_de_dados import DatabaseManager, sha256
 from apscheduler.schedulers.background import BackgroundScheduler
-
+import requests
 
 
 
@@ -14,6 +14,23 @@ app.secret_key = 'chave_secreta'
 db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
 db = DatabaseManager(db_url)
 
+BASE_URL = "http://10.180.0.100:8123/api/states"
+TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MWFiZWY2ZTIyOWU0YjY5YTliNjc0NWU1MzhiZTI2NyIsImlhdCI6MTc0NTMyNTU3MywiZXhwIjoyMDYwNjg1NTczfQ.o07Qigaa-TOlNp1HFLBSzXYpMmVX0qOXZWl-WWASjKw"
+
+# Cabeçalhos
+headers = {
+    "Authorization": f"Bearer {TOKEN}",
+    "Content-Type": "application/json"
+}
+
+# Sensores que queremos pegar
+sensor_ids = {
+    "sensor.vento_kmh": "velocidade_vento",
+    "sensor.direzione_vento": "direcao_vento",
+    "sensor.precipitacao_mm": "precipitacao",
+    "sensor.tasmota_am2301_temperature": "temperatura",
+    "sensor.tasmota_am2301_humidity": "umidade"
+}
 
 #scheduler = BackgroundScheduler()
 #scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0)
@@ -126,7 +143,25 @@ def estado(chave):
     return jsonify(estado)
 
 
+@app.route("/estacao")
+def estacao():
+    try:
+        response = requests.get(BASE_URL, headers=headers)
+        response.raise_for_status()
 
+        dados = response.json()
+        resultado = {}
+
+        for sensor in dados:
+            eid = sensor.get("entity_id")
+            if eid in sensor_ids:
+                resultado[sensor_ids[eid]] = sensor.get("state")
+
+        return resultado
+
+    except requests.exceptions.RequestException as e:
+        print("Erro ao conectar com o Home Assistant:", e)
+        return {}
 
 @app.route("/admin")
 @login_required
@@ -172,7 +207,7 @@ def adicionar_solo():
 #    return {"status": "Sucesso"}, 200
 
 
-#app.run(debug=True, host="localhost", port=80)
+#app.run(debug=True, host="localhost")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
