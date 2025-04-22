@@ -17,6 +17,7 @@ db = DatabaseManager(db_url)
 BASE_URL = "http://10.180.0.100:8123/api/states"
 TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MWFiZWY2ZTIyOWU0YjY5YTliNjc0NWU1MzhiZTI2NyIsImlhdCI6MTc0NTMyNTU3MywiZXhwIjoyMDYwNjg1NTczfQ.o07Qigaa-TOlNp1HFLBSzXYpMmVX0qOXZWl-WWASjKw"
 
+
 # Cabeçalhos
 headers = {
     "Authorization": f"Bearer {TOKEN}",
@@ -145,7 +146,31 @@ def estado(chave):
 
 @app.route("/estacao")
 def estacao():
-    try:
+    latitude = -5.6622
+    longitude = -37.7989
+
+    url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={latitude}&longitude={longitude}"
+        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation"
+    )
+
+    res = requests.get(url)
+
+    if res.status_code == 200:
+        dados = res.json()["current"]
+        temperatura = f"{dados['temperature_2m']} °C"
+        umidade = f"{dados['relative_humidity_2m']} %"
+        radiacao_solar = f"{dados['shortwave_radiation']} W/m²
+        
+        return jsonify({"temperatura": temperatura,
+                        "umidade": umidade,
+                        "radiacao_solar": radiacao_solar})
+    else:
+        return jsonify({"temperatura": "Sem dados",
+                        "umidade": "Sem dados",
+                        "radiacao_solar": "Sem dados"})
+    """try:
         response = requests.get(BASE_URL, headers=headers)
         response.raise_for_status()
 
@@ -161,7 +186,7 @@ def estacao():
 
     except requests.exceptions.RequestException as e:
         print("Erro ao conectar com o Home Assistant:", e)
-        return jsonify({})
+        return jsonify({})"""
 
 
 @app.route("/admin")
@@ -208,7 +233,7 @@ def adicionar_solo():
 #    return {"status": "Sucesso"}, 200
 
 
-#app.run(debug=True, host="localhost")
+#app.run(debug=True, host="localhost", port=80)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

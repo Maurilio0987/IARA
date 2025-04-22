@@ -195,55 +195,17 @@
     </header>
 
     <div class="container">
-        <!--<div class="box">
-            <h3>Informações da planta</h3>
-            <div class="data">
-                <!--<p><span>Planta:</span> Coentro</p>- ->
-            </div>
-        </div>
-		
-		<div class="box">
-            <h3>Informações do solo</h3>
-            <div class="data">
-            </div>
-        </div>
-		
-		<div class="box">
-            <h3>Informações da horta</h3>
-            <div class="data">
-            </div>
-        </div>-->
-
-
 
         <div class="box full-width">
             <h3>Estação Meteorológica</h3>
-            <div class="data"><span>Temperatura:</span><span id="temperatura"> --°C</span></div>
-            <div class="data"><span>Umidade do ar:</span><span id="umidade"> --%</span></div>
-            <!--<div class="data"><span>Pressão Atmosférica:</span> ---- hPa</div>
-            <div class="data"><span>Velocidade do Vento:</span> -- km/h</div>
-            <div class="data"><span>Precipitação Estimada:</span> -- mm</div>
-            <div class="graph" id="historico-meteorologico"></div>-->
+            <div class="data"><span>Temperatura:</span><span id="temperatura"> ---</span></div>
+            <div class="data"><span>Umidade do ar:</span><span id="umidade"> ---</span></div>
+            <div class="data"><span>Radiação solar:</span><span id="solar"> ---</span></div>
+            
         </div>
     </div>
 	
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="/static/js/horta.js"></script>
-    <script>
-        function toggleGraph(tipo) {
-            const graph = document.getElementById("historico-umidade");
-            if (tipo === 'umidade') {
-                graph.style.backgroundColor = "#99c2ff";
-                graph.innerHTML = "<p class='data'>Histórico de Umidade</p>";
-            } else if (tipo === 'agua') {
-                graph.style.backgroundColor = "#ffcc99";
-                graph.innerHTML = "<p class='data'>Histórico de Consumo de Água</p>";
-            } else if (tipo === 'temperatura') {
-                const meteorologico = document.getElementById("historico-meteorologico");
-                meteorologico.style.backgroundColor = "#ffb3b3";
-                meteorologico.innerHTML = "<p class='data'>Histórico de Temperatura</p>";
-            }
-        }
-    </script>
 </body>
 </html>
