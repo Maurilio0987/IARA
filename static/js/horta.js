@@ -1,4 +1,4 @@
-const BASE_URL = "http://10.180.0.100:8123/api/states/";
+const BASE_URL = "https://10.180.0.100:8123/api/states/";
 const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MWFiZWY2ZTIyOWU0YjY5YTliNjc0NWU1MzhiZTI2NyIsImlhdCI6MTc0NTMyNTU3MywiZXhwIjoyMDYwNjg1NTczfQ.o07Qigaa-TOlNp1HFLBSzXYpMmVX0qOXZWl-WWASjKw";
 
 
@@ -49,21 +49,21 @@ function atualizar_estacao() {
                 }
         });
 
-      // Exibe os valores
-      console.log("Velocidade do Vento:", vento_kmh);
-      console.log("Direção do Vento:", direcao_vento);
-      console.log("Precipitação:", precipitacao_mm);
-      console.log("Temperatura:", temperatura);
-      console.log("Umidade:", umidade);
+          // Exibe os valores
+        console.log("Velocidade do Vento:", vento_kmh);
+        console.log("Direção do Vento:", direcao_vento);
+        console.log("Precipitação:", precipitacao_mm);
+        console.log("Temperatura:", temperatura);
+        console.log("Umidade:", umidade);
 
 
-      let elemento_temperatura = document.getElementById("temperatura");
-      let elemento_umidade = document.getElementById("umidade");
+        let elemento_temperatura = document.getElementById("temperatura");
+        let elemento_umidade = document.getElementById("umidade");
 
-      elemento_temperatura.innerHTML = `${String(temperatura)}%`;
-      elemento_umidade.innerHTML = `${String(umidade)}%`;
-      // Você pode usar essas variáveis onde quiser agora
-      })
+        elemento_temperatura.innerHTML = `${String(temperatura)}°C`;
+        elemento_umidade.innerHTML = `${String(umidade)}%`;
+        // Você pode usar essas variáveis onde quiser agora
+        })
       .catch(error => {
         console.error("Erro ao obter dados:", error);
       });
