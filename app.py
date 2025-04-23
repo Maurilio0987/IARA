@@ -117,7 +117,8 @@ def hortas():
 @app.route("/hortas/<chave>")
 @login_required
 def horta(chave):
-    return render_template("horta.html")
+    horta = db.horta(chave)
+    return render_template("horta.html", horta=horta)
 
 
 @app.route("/cadastrar_horta", methods=["POST"])
@@ -161,7 +162,7 @@ def estacao():
         dados = res.json()["current"]
         temperatura = f"{dados['temperature_2m']} °C"
         umidade = f"{dados['relative_humidity_2m']} %"
-        radiacao_solar = f"{dados['shortwave_radiation']} W/m²
+        radiacao_solar = f"{dados['shortwave_radiation']} W/m²"
         
         return jsonify({"temperatura": temperatura,
                         "umidade": umidade,
@@ -233,8 +234,8 @@ def adicionar_solo():
 #    return {"status": "Sucesso"}, 200
 
 
-#app.run(debug=True, host="localhost", port=80)
+app.run(debug=True, host="localhost", port=80)
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+#    port = int(os.environ.get("PORT", 5000))
+#    app.run(host="0.0.0.0", port=port)

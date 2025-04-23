@@ -10,7 +10,7 @@ function atualizar_estacao() {
     
 	 let elemento_temperatura = document.getElementById("temperatura");
 	 let elemento_umidade = document.getElementById("umidade");
-	 let elemento_solar = document.getElementById("solar");
+	 let elemento_solar = document.getElementById("radiacao");
 	 
 	 elemento_temperatura.innerHTML = " " + data["temperatura"]
 	 elemento_umidade.innerHTML = " " + data["umidade"]
@@ -24,19 +24,6 @@ function atualizar_estacao() {
  
 }
 
-
-function atualizar_tudo() {
-	atualizar_estacao()
-}
-
-
-function umidade(valor) {
-	fetch("/umidade", {
-	method: "POST",
-	headers: {"Content-Type": "application/json"},
-	body: JSON.stringify({"umidade": valor})
-	})
-}
-
-setInterval(atualizar_tudo, 900000);
+atualizar_estacao()
+setInterval(atualizar_estacao, 900000);
 

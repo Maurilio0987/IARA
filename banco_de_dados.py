@@ -164,8 +164,31 @@ class DatabaseManager:
         conexão.close()
         
         return hortas
-    
-    
+
+
+    def horta(self, chave):
+        query = """
+        SELECT hortas.id, hortas.tamanho, culturas.nome, solos.nome, hortas.chave, estagios.nome, hortas.duracao
+        FROM hortas
+        JOIN usuarios ON hortas.usuario_id = usuarios.id
+        JOIN estagios on hortas.estagio_id = estagios.id
+        JOIN culturas ON estagios.cultura_id = culturas.id
+        JOIN solos ON hortas.solo_id = solos.id
+        WHERE hortas.chave = %s;
+        """
+        
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        cursor.execute(query, (chave,))
+        
+        horta = cursor.fetchone()
+        
+        cursor.close()
+        conexão.close()
+        
+        return horta
+        
+        
     def culturas(self):
         query = "SELECT MIN(id) AS id, nome FROM culturas GROUP BY nome;"
         conexão = self.conectar_banco_de_dados()
