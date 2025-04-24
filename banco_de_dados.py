@@ -59,6 +59,7 @@ class DatabaseManager:
         self.executar("""
         CREATE TABLE IF NOT EXISTS hortas (
             id INT AUTO_INCREMENT PRIMARY KEY,
+            nome varchar(100) NOT NULL,
             usuario_id INT NOT NULL,
             tamanho FLOAT NOT NULL,
             duracao INT NOT NULL,
@@ -145,7 +146,7 @@ class DatabaseManager:
     
     def hortas(self, email):
         query = """
-        SELECT hortas.id, hortas.tamanho, culturas.nome, solos.nome, hortas.chave
+        SELECT hortas.id, hortas.nome, hortas.chave
         FROM hortas
         JOIN usuarios ON hortas.usuario_id = usuarios.id
         JOIN estagios on hortas.estagio_id = estagios.id
@@ -168,7 +169,7 @@ class DatabaseManager:
 
     def horta(self, chave):
         query = """
-        SELECT hortas.id, hortas.tamanho, culturas.nome, solos.nome, hortas.chave, estagios.nome, hortas.duracao
+        SELECT hortas.id, hortas.nome, hortas.tamanho, culturas.nome, solos.nome, hortas.chave, estagios.nome, hortas.duracao
         FROM hortas
         JOIN usuarios ON hortas.usuario_id = usuarios.id
         JOIN estagios on hortas.estagio_id = estagios.id
@@ -234,11 +235,11 @@ class DatabaseManager:
         return estagio_id
 
 
-    def adicionar_horta(self, usuario, tamanho, cultura, solo, tempo):
+    def adicionar_horta(self, usuario, nome, tamanho, cultura, solo, tempo):
         estagio_id = self.estagio(cultura, tempo)
         if estagio_id != None:
-            self.executar(f"""INSERT INTO hortas (usuario_id, tamanho, duracao, solo_id, estagio_id, estado) VALUES 
-                            ({usuario}, {tamanho}, {tempo}, {solo}, {estagio_id}, 'Desligado')""")
+            self.executar(f"""INSERT INTO hortas (usuario_id, nome, tamanho, duracao, solo_id, estagio_id, estado) VALUES 
+                            ({usuario}, '{nome}', {tamanho}, {tempo}, {solo}, {estagio_id}, 'Desligado')""")
             return True
         return False
     
@@ -336,5 +337,4 @@ class DatabaseManager:
 if __name__ == "__main__":
     db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
     db = DatabaseManager(db_url)
-    db.imprimir_tabela("culturas")
     

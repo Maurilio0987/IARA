@@ -4,6 +4,7 @@ import os
 from banco_de_dados import DatabaseManager, sha256
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
+import math
 
 
 
@@ -38,6 +39,12 @@ sensor_ids = {
 #scheduler.start()
 
 
+
+
+#                  #   
+#-----ESTÁTICO-----#
+#                  #
+
 @app.route("/sobre")
 def sobre():
     return render_template("sobre.html")
@@ -52,6 +59,9 @@ def contato():
 def ajuda():
     return render_template("ajuda.html")
     
+#               #   
+#-----LOGIN-----#
+#               #
 
 def login_required(f):
     @wraps(f)
@@ -106,6 +116,10 @@ def cadastrar():
     return redirect(url_for("cadastro"))
 
 
+#                #   
+#-----HORTAS-----#
+#                #
+
 @app.route("/hortas")
 @login_required
 def hortas():
@@ -118,18 +132,37 @@ def hortas():
 @login_required
 def horta(chave):
     horta = db.horta(chave)
-    return render_template("horta.html", horta=horta)
+    return render_template("horta.html", horta={
+        "nome": horta[1],
+        "planta": horta[3],
+        "solo": horta[4],
+        "estagio": horta[6],
+        "tempo": horta[7],
+        "area": horta[2]
+    },
+    clima={
+        "temperatura": "---",
+        "umidade": "---",
+        "vento": "---",
+        "radiacao": "---",
+        "eto": "---",
+    },
+    gasto={
+        "etc": "---",
+        "volume": "---"
+    })
 
 
 @app.route("/cadastrar_horta", methods=["POST"])
 def cadastrar_horta():
     dados = request.json
+    nome = dados.get("nome")
     tamanho = dados.get("tamanho")
     cultura = dados.get("cultura")
     solo = dados.get("solo")
     tempo = int(dados.get("tempo"))
     usuario = db.usuario(session["email"])
-    db.adicionar_horta(usuario, tamanho, cultura, solo, tempo)
+    db.adicionar_horta(usuario, nome, tamanho, cultura, solo, tempo)
     
     return {"status": "Sucesso"}, 200
 
@@ -145,6 +178,13 @@ def estado(chave):
     return jsonify(estado)
 
 
+
+
+#                 #   
+#-----ESTAÇÃO-----#
+#                 #
+
+
 @app.route("/estacao")
 def estacao():
     latitude = -5.6622
@@ -153,7 +193,7 @@ def estacao():
     url = (
         f"https://api.open-meteo.com/v1/forecast?"
         f"latitude={latitude}&longitude={longitude}"
-        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation"
+        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation,wind_speed_10m"
     )
 
     res = requests.get(url)
@@ -163,14 +203,25 @@ def estacao():
         temperatura = f"{dados['temperature_2m']} °C"
         umidade = f"{dados['relative_humidity_2m']} %"
         radiacao_solar = f"{dados['shortwave_radiation']} W/m²"
-        
-        return jsonify({"temperatura": temperatura,
-                        "umidade": umidade,
-                        "radiacao_solar": radiacao_solar})
+        velocidade_10m = dados['wind_speed_10m']
+
+        velocidade_2m = velocidade_10m * (4.87 / math.log(67.8 * 10 - 5.42))
+        velocidade_vento_2m = f"{velocidade_2m:.2f} km/h"
+
+        return jsonify({
+            "temperatura": temperatura,
+            "umidade": umidade,
+            "radiacao_solar": radiacao_solar,
+            "vento": velocidade_vento_2m
+        })
     else:
-        return jsonify({"temperatura": "Sem dados",
-                        "umidade": "Sem dados",
-                        "radiacao_solar": "Sem dados"})
+        return jsonify({
+            "temperatura": "---",
+            "umidade": "---",
+            "radiacao_solar": "---",
+            "vento": "---"
+        })
+
     """try:
         response = requests.get(BASE_URL, headers=headers)
         response.raise_for_status()
@@ -187,7 +238,16 @@ def estacao():
 
     except requests.exceptions.RequestException as e:
         print("Erro ao conectar com o Home Assistant:", e)
-        return jsonify({})"""
+        return jsonify({"temperatura": "---",
+                        "umidade": "---",
+                        "radiacao_solar": "---"})"""
+
+
+
+
+#             #   
+#-----ADM-----#
+#             #
 
 
 @app.route("/admin")
@@ -221,17 +281,6 @@ def adicionar_solo():
     
     db.adicionar_solo(nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica)
     return redirect(url_for("admin/solos"))
-    
-    
-#@app.route("/dados")
-#def dados():
-#    return jsonify(banco_de_dados)
-    
-    
-#@app.route("/umidade", methods=["POST"])
-#def umidade():
-#    banco_de_dados["umidade"] = request.get_json()["umidade"]
-#    return {"status": "Sucesso"}, 200
 
 
 #app.run(debug=True, host="localhost", port=80)

@@ -85,35 +85,35 @@
         <!-- Estação Meteorológica -->
 		<div class="box">
             <h4>Horta</h4>
-            <div class="data">Planta: <span>{{ horta[2] }}</span></div>
-			<div class="data">Estágio: <span>{{ horta[5] }}</span></div>
-			<div class="data">Tempo de cultivo: <span>{{ horta[6] }} dia(s)</span></div>
-			<div class="data">Área cultivada: <span>{{ horta[1] }} m²</span></div>
-			<div class="data">Tipo de solo: <span>{{ horta[3] }}</span></div>
+            <div class="data">Planta: <span>{{ horta.planta }}</span></div>
+			<div class="data">Estágio: <span>{{ horta.estagio }}</span></div>
+			<div class="data">Tempo de cultivo: <span>{{ horta.tempo }} dia(s)</span></div>
+			<div class="data">Área cultivada: <span>{{ horta.area }} m²</span></div>
+			<div class="data">Tipo de solo: <span>{{ horta.solo }}</span></div>
         </div>
 		
         <div class="box">
             <h4>Estação Meteorológica</h4>
-            <div class="data">Temperatura: <span id="temperatura">---</span></div>
-            <div class="data">Umidade do ar: <span id="umidade">---</span></div>
-            <div class="data">Radiação solar: <span id="radiacao">---</span></div>
+            <div class="data">Temperatura: <span id="temperatura">{{ clima.temperatura }}</span></div>
+            <div class="data">Umidade do ar: <span id="umidade">{{ clima.umidade }}</span></div>
+            <div class="data">Radiação solar: <span id="radiacao">{{ clima.radiacao }}</span></div>
+            <div class="data">Velocidade do vento: <span id="vento">{{ clima.vento }}</span></div>
+			<div class="data">ETo: <span id="eto">{{ clima.eto }}</span></div>
         </div>
-				
+
         <!-- Gasto de Água -->
         <div class="box">
             <h4>Gasto de água</h4>
-            <div class="data">Planta: <span id="planta">---</span></div>
-            <div class="data">ETc: <span id="etc">--- mm/dia</span></div>
-            <div class="data">Área: <span id="area">--- m²</span></div>
-            <div class="data">Volume: <span id="volume">--- L/dia</span></div>
+            <div class="data">ETc: <span id="etc">{{ gasto.etc }} mm/dia</span></div>
+            <div class="data">Volume: <span id="volume">{{ gasto.volume }} L/dia</span></div>
         </div>
 
 
-        <!-- Gráfico de Consumo -->
+        <!-- Gráfico de Consumo 
         <div class="box full-width">
             <h4>Gráfico de gastos de água</h4>
             <canvas id="graficoAgua"></canvas>
-        </div>
+        </div> -->
 
     </main>
 	
@@ -163,7 +163,7 @@
                 }
             });
         }
-
+		
         // Exemplo de uso da função (valores simulados)
         const diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
         const consumoSimulado = [120, 300, 125, 140, 135, 128, 132];
