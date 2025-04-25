@@ -7,6 +7,7 @@ function atualizar_estacao() {
     return response.json(); // ou response.text() se for texto
   })
   .then(data => {
+     console.log(data);
 	 let elemento_temperatura = document.getElementById("temperatura");
 	 let elemento_umidade = document.getElementById("umidade");
 	 let elemento_solar = document.getElementById("radiacao");
@@ -24,6 +25,6 @@ function atualizar_estacao() {
  
 }
 
-atualizar_estacao()
+atualizar_estacao();
 setInterval(atualizar_estacao, 900000);
 
