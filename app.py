@@ -7,7 +7,6 @@ import requests
 import math
 
 
-
 app = Flask(__name__)
 app.secret_key = 'chave_secreta'  
 
@@ -19,13 +18,11 @@ BASE_URL = "http://10.180.0.100:8123/api/states"
 TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MWFiZWY2ZTIyOWU0YjY5YTliNjc0NWU1MzhiZTI2NyIsImlhdCI6MTc0NTMyNTU3MywiZXhwIjoyMDYwNjg1NTczfQ.o07Qigaa-TOlNp1HFLBSzXYpMmVX0qOXZWl-WWASjKw"
 
 
-# Cabeçalhos
 headers = {
     "Authorization": f"Bearer {TOKEN}",
     "Content-Type": "application/json"
 }
 
-# Sensores que queremos pegar
 sensor_ids = {
     "sensor.vento_kmh": "velocidade_vento",
     "sensor.direzione_vento": "direcao_vento",
@@ -34,14 +31,13 @@ sensor_ids = {
     "sensor.tasmota_am2301_humidity": "umidade"
 }
 
+
 #scheduler = BackgroundScheduler()
 #scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0)
 #scheduler.start()
 
 
-
-
-#                  #   
+#                  #
 #-----ESTÁTICO-----#
 #                  #
 
@@ -180,14 +176,14 @@ def estado(chave):
 
 
 
-#                 #   
+#                 #
 #-----ESTAÇÃO-----#
 #                 #
 
 
 @app.route("/estacao")
 def estacao():
-    latitude = -5.6622
+    """latitude = -5.6622
     longitude = -37.7989
 
     url = (
@@ -221,8 +217,8 @@ def estacao():
             "radiacao_solar": "---",
             "vento": "---"
         })
-
-    """try:
+    """
+    try:
         response = requests.get(BASE_URL, headers=headers)
         response.raise_for_status()
 
@@ -240,12 +236,10 @@ def estacao():
         print("Erro ao conectar com o Home Assistant:", e)
         return jsonify({"temperatura": "---",
                         "umidade": "---",
-                        "radiacao_solar": "---"})"""
+                        "radiacao_solar": "---"})
 
 
-
-
-#             #   
+#             #
 #-----ADM-----#
 #             #
 
@@ -284,6 +278,7 @@ def adicionar_solo():
 
 
 #app.run(debug=True, host="localhost", port=80)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
