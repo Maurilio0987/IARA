@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de administrador</title>
+	<link rel="icon" href="/static/imgs/icone.png" type="image/png">
+	<link rel="icon" href="/static/imgs/icone.ico" type="image/x-icon">
+	
+	
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+	  table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 20px;
+	  }
+
+	  th, td {
+		border: 1px solid #ccc;
+		padding: 10px;
+		text-align: left;
+	  }
+
+	  th {
+		background-color: #03491a;
+		color: white;
+	  }
+
+	  tr:nth-child(even) {
+		background-color: #f2f2f2;
+	  }
+
+	  tr:hover {
+		background-color: #e0ffe0;
+	  }
+	</style>
+</head>
+<body>
+    <h1>solos</h1>
+	<section>
+		<form action="/admin/adicionar_solo" method="POST">
+			<input name="nome" type="text">
+			<input name="capacidade_campo" type="number">
+			<input name="ponto_murcha" type="number">
+			<input name="densidade" type="number">
+			<input name="porosidade" type="number">
+			<input name="cond_hidraulica" type="text">
+			<input type="submit" value="Adicionar">
+		</form>
+	</section>
+    <table>
+		<thead>
+			<tr>
+				<th>id</th>
+				<th>nome</th>
+				<th>capacidade_campo</th>
+				<th>ponto_murcha</th>
+				<th>densidade</th>
+				<th>porosidade</th>
+				<th>cond_hidraulica</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for solo in tabela %}
+				<tr>
+					<td>{{ solo[0] }}</td>
+					<td>{{ solo[1] }}</td>
+					<td>{{ solo[2] }}</td>
+					<td>{{ solo[3] }}</td>
+					<td>{{ solo[4] }}</td>
+					<td>{{ solo[5] }}</td>
+					<td>{{ solo[6] }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+    </table>
+    <a href="/admin">voltar</a>
+</body>
+</html>
