@@ -229,14 +229,21 @@ def estacao():
             eid = sensor.get("entity_id")
             if eid in sensor_ids:
                 resultado[sensor_ids[eid]] = sensor.get("state")
+        resposta = {"precipitacao": resultado["precipitacao"],
+                    "vento": resultado["velocidade_vento"],
+                    "direcao": resultado["direcao_vento"],
+                    "temperatura": resultado["temperatura"],
+                    "umidade": resultado["umidade"]}
 
-        return jsonify(resultado)
+        return resposta
 
     except requests.exceptions.RequestException as e:
         print("Erro ao conectar com o Home Assistant:", e)
-        return jsonify({"temperatura": "---",
-                        "umidade": "---",
-                        "radiacao_solar": "---"})
+        return {"precipitacao": "---",
+                "vento": "---",
+                "direcao": "---",
+                "temperatura": "---",
+                "umidade": "---"}
 
 
 #             #
