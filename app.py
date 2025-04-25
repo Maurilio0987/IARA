@@ -183,7 +183,7 @@ def estado(chave):
 
 @app.route("/estacao")
 def estacao():
-    """latitude = -5.6622
+    latitude = -5.6622
     longitude = -37.7989
 
     url = (
@@ -243,7 +243,7 @@ def estacao():
                 "vento": "---",
                 "direcao": "---",
                 "temperatura": "---",
-                "umidade": "---"}
+                "umidade": "---"}"""
 
 
 #             #
