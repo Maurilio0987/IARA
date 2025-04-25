@@ -77,20 +77,18 @@ class DatabaseManager:
         
     def conectar_banco_de_dados(self):
         parsed_url = urlparse(self.db_url)
-        
-        # Conexão com o MySQL utilizando PyMySQL
+
         conexão = pymysql.connect(
             user=parsed_url.username,
             password=parsed_url.password,
             host=parsed_url.hostname,
             port=parsed_url.port,
             database=parsed_url.path.lstrip('/'),
-            autocommit=True  # Habilitar autocommit para evitar a necessidade de commit explícito
+            autocommit=True
         )
         return conexão
 
     def executar(self, query):
-        # Função para executar queries
         conexão = self.conectar_banco_de_dados()
         cursor = conexão.cursor()
         cursor.execute(query)
@@ -169,7 +167,7 @@ class DatabaseManager:
 
     def horta(self, chave):
         query = """
-        SELECT hortas.id, hortas.nome, hortas.tamanho, culturas.nome, solos.nome, hortas.chave, estagios.nome, hortas.duracao
+        SELECT hortas.id, hortas.nome, hortas.tamanho, culturas.nome, solos.nome, hortas.chave, estagios.nome, hortas.duracao, estagios.kc
         FROM hortas
         JOIN usuarios ON hortas.usuario_id = usuarios.id
         JOIN estagios on hortas.estagio_id = estagios.id

@@ -37,9 +37,86 @@ sensor_ids = {
 #scheduler.start()
 
 
+#                 #
+#-----FUNÇÕES-----#
+#                 #
+
+
+def dados_meteorologicos():
+    latitude = -5.6622
+    longitude = -37.7989
+
+    url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={latitude}&longitude={longitude}"
+        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation,wind_speed_10m"
+    )
+
+    res = requests.get(url)
+
+    if res.status_code == 200:
+        dados = res.json()["current"]
+        temperatura = f"{dados['temperature_2m']} °C"
+        umidade = f"{dados['relative_humidity_2m']} %"
+        radiacao_solar = f"{dados['shortwave_radiation']} W/m²"
+        velocidade_10m = dados['wind_speed_10m']
+
+        velocidade_2m = velocidade_10m * (4.87 / math.log(67.8 * 10 - 5.42))
+        velocidade_vento_2m = f"{velocidade_2m:.2f} km/h"
+
+        return {
+            "temperatura": temperatura,
+            "umidade": umidade,
+            "radiacao_solar": radiacao_solar,
+            "vento": velocidade_vento_2m
+        }
+    else:
+        return {
+            "temperatura": "---",
+            "umidade": "---",
+            "radiacao_solar": "---",
+            "vento": "---"
+        }
+"""
+    try:
+        response = requests.get(BASE_URL, headers=headers)
+        response.raise_for_status()
+
+        dados = response.json()
+        resultado = {}
+
+        for sensor in dados:
+            eid = sensor.get("entity_id")
+            if eid in sensor_ids:
+                resultado[sensor_ids[eid]] = sensor.get("state")
+        resposta = {"precipitacao": resultado["precipitacao"],
+                    "vento": resultado["velocidade_vento"],
+                    "direcao": resultado["direcao_vento"],
+                    "temperatura": resultado["temperatura"],
+                    "umidade": resultado["umidade"]}
+
+        return resposta
+
+    except requests.exceptions.RequestException as e:
+        print("Erro ao conectar com o Home Assistant:", e)
+        return {"precipitacao": "---",
+                "vento": "---",
+                "direcao": "---",
+                "temperatura": "---",
+                "umidade": "---"}
+"""
+
+
+def calcular_consumo(kc):
+    estacao = dados_meteorologicos()
+    consumo = {}
+    return consumo
+
+
 #                  #
 #-----ESTÁTICO-----#
 #                  #
+
 
 @app.route("/sobre")
 def sobre():
@@ -54,10 +131,12 @@ def contato():
 @app.route("/ajuda")
 def ajuda():
     return render_template("ajuda.html")
-    
+
+
 #               #   
 #-----LOGIN-----#
 #               #
+
 
 def login_required(f):
     @wraps(f)
@@ -115,6 +194,7 @@ def cadastrar():
 #                #   
 #-----HORTAS-----#
 #                #
+
 
 @app.route("/hortas")
 @login_required
@@ -174,6 +254,10 @@ def estado(chave):
     return jsonify(estado)
 
 
+@app.route("/consumo/<chave>")
+def consumo(chave):
+    kc = db.horta(chave)[8]
+    return jsonify(calcular_consumo(kc))
 
 
 #                 #
@@ -183,67 +267,7 @@ def estado(chave):
 
 @app.route("/estacao")
 def estacao():
-    latitude = -5.6622
-    longitude = -37.7989
-
-    url = (
-        f"https://api.open-meteo.com/v1/forecast?"
-        f"latitude={latitude}&longitude={longitude}"
-        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation,wind_speed_10m"
-    )
-
-    res = requests.get(url)
-
-    if res.status_code == 200:
-        dados = res.json()["current"]
-        temperatura = f"{dados['temperature_2m']} °C"
-        umidade = f"{dados['relative_humidity_2m']} %"
-        radiacao_solar = f"{dados['shortwave_radiation']} W/m²"
-        velocidade_10m = dados['wind_speed_10m']
-
-        velocidade_2m = velocidade_10m * (4.87 / math.log(67.8 * 10 - 5.42))
-        velocidade_vento_2m = f"{velocidade_2m:.2f} km/h"
-
-        return jsonify({
-            "temperatura": temperatura,
-            "umidade": umidade,
-            "radiacao_solar": radiacao_solar,
-            "vento": velocidade_vento_2m
-        })
-    else:
-        return jsonify({
-            "temperatura": "---",
-            "umidade": "---",
-            "radiacao_solar": "---",
-            "vento": "---"
-        })
-    """
-    try:
-        response = requests.get(BASE_URL, headers=headers)
-        response.raise_for_status()
-
-        dados = response.json()
-        resultado = {}
-
-        for sensor in dados:
-            eid = sensor.get("entity_id")
-            if eid in sensor_ids:
-                resultado[sensor_ids[eid]] = sensor.get("state")
-        resposta = {"precipitacao": resultado["precipitacao"],
-                    "vento": resultado["velocidade_vento"],
-                    "direcao": resultado["direcao_vento"],
-                    "temperatura": resultado["temperatura"],
-                    "umidade": resultado["umidade"]}
-
-        return resposta
-
-    except requests.exceptions.RequestException as e:
-        print("Erro ao conectar com o Home Assistant:", e)
-        return {"precipitacao": "---",
-                "vento": "---",
-                "direcao": "---",
-                "temperatura": "---",
-                "umidade": "---"}"""
+    return jsonify(dados_meteorologicos())
 
 
 #             #
