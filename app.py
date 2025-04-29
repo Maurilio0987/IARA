@@ -128,11 +128,14 @@ def dados_meteorologicos():
 
 def calcular_consumo(kc, area):
     dados = dados_meteorologicos()
-    temperatura, umidade, rad_solar, velocidade_vento = dados["temperatura"], dados["umidade"] ,dados["radiacao_solar"], dados["vento"]
+    temperatura = dados["temperatura"]
+    umidade = dados["umidade"]
+    rad_solar = dados["radiacao_solar"]
+    velocidade_vento = dados["vento"]
     eto = calcular_eto(temperatura, umidade, velocidade_vento,  rad_solar)
     etc = eto * kc
     consumo = etc * area
-
+    print(dados)
     return {"eto": eto,
             "etc": etc,
             "consumo": consumo}
