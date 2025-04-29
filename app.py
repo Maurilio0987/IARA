@@ -131,10 +131,13 @@ def dados_meteorologicos():
     velocidade_vento = resposta["vento"]
 """
 
-def calcular_consumo(kc):
+def calcular_consumo(kc, area):
     eto = calcular_eto()
-    consumo = {}
-    return consumo
+    etc = eto * kc
+    consumo = etc * area
+    return {"eto": eto,
+            "etc": etc,
+            "consumo": consumo}
 
 
 #                  #
@@ -280,8 +283,11 @@ def estado(chave):
 
 @app.route("/consumo/<chave>")
 def consumo(chave):
-    kc = db.horta(chave)[8]
-    return jsonify(calcular_consumo(kc))
+    horta = db.horta(chave)
+    kc = horta[8]
+    area = horta[2]
+
+    return jsonify(calcular_consumo(kc, area))
 
 
 #                 #
