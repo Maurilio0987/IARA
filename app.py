@@ -72,48 +72,53 @@ def calcular_eto(T, RH, u2, Rs_Wm2):
 	return Eto
 
 
-
 def dados_meteorologicos():
-	latitude = -5.6622
-	longitude = -37.7989
+    latitude = -5.6622
+    longitude = -37.7989
 
-	url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=relative_humidity_2m,shortwave_radiation"
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=relative_humidity_2m,shortwave_radiation"
 
-	response = requests.get(BASE_URL, headers=headers)
-	response.raise_for_status()
+    response = requests.get(BASE_URL, headers=headers)
+    response.raise_for_status()
 
-	dados = response.json()
-	resultado = {}
+    dados_home = response.json()
+    resultado = {}
 
-	for sensor in dados:
-		eid = sensor.get("entity_id")
-		if eid in sensor_ids:
-			resultado[sensor_ids[eid]] = sensor.get("state")
+    for sensor in dados_home:
+        eid = sensor.get("entity_id")
+        if eid in sensor_ids:
+            resultado[sensor_ids[eid]] = sensor.get("state")
 
-	resposta = {"precipitacao": resultado["precipitacao"],
-				"vento": float(resultado["velocidade_vento"])*3.6,
-				"direcao": resultado["direcao_vento"],
-				"temperatura": resultado["temperatura"],
-				"umidade": resultado["umidade"]}
+    resposta = {
+        "precipitacao": resultado["precipitacao"],
+        "vento": float(resultado["velocidade_vento"]) * 3.6,
+        "direcao": resultado["direcao_vento"],
+        "temperatura": resultado["temperatura"],
+        "umidade": resultado["umidade"]
+    }
 
-	temperatura = resposta["temperatura"]
-	velocidade_vento = resposta["vento"]
+    temperatura = resposta["temperatura"]
+    velocidade_vento = resposta["vento"]
 
-	res = requests.get(url)
-	if res.status_code == 200:
-		dados = res.json()["current"]
-		umidade = dados['relative_humidity_2m']
-		rad_solar = dados['shortwave_radiation']
+    res = requests.get(url)
+    if res.status_code == 200:
+        dados = res.json()["current"]
+        umidade = dados['relative_humidity_2m']
+        rad_solar = dados['shortwave_radiation']
 
-        return {"temperatura": temperatura,
-                "umidade": umidade,
-                "radiacao_solar": rad_solar,
-                "vento": velocidade_vento}
-
-    return {"temperatura": "---",
+        return {
+            "temperatura": temperatura,
+            "umidade": umidade,
+            "radiacao_solar": rad_solar,
+            "vento": velocidade_vento
+        }
+    else:
+        return {
+            "temperatura": "---",
             "umidade": "---",
             "radiacao_solar": "---",
-            "vento": "---"}
+            "vento": "---"
+        }
 
 
 def calcular_consumo(kc):
