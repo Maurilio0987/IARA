@@ -5,7 +5,7 @@ function getChaveHorta() {
 
 function atualizar_consumo() {
   const chave = getChaveHorta();
-  fetch(`/consumo/${chave}`)
+  fetch("/consumo/"+chave)
   .then(response => {
     if (!response.ok) {
       throw new Error(`Erro na requisição: ${response.status}`);
