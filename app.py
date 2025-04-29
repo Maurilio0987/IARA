@@ -64,7 +64,7 @@ def calcular_eto(T, RH, u2, Rs_Wm2):
 				  + gamma * (900.0 / (T + 273.0)) * u2 * (es - ea)
 		  ) / (delta + gamma * (1 + 0.34 * u2))
 
-	return Eto
+	return round(Eto)
 
 
 def dados_meteorologicos():
