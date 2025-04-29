@@ -1,5 +1,0 @@
-Flask
-gunicorn
-pymysql
-apscheduler
-requests
