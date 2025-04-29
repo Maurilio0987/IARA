@@ -42,73 +42,82 @@ sensor_ids = {
 #                 #
 
 
+def calcular_eto(T, RH, u2, Rs_Wm2):
+	"""
+     Calcula ET0 simplificado (mm/dia) usando apenas
+     temperatura média (T, °C), umidade (%) ,
+     velocidade do vento u2 (m/s) e radiação Rs (W/m²).
+	"""
+	# 1) Radiação líquida (MJ/m²·dia)
+	Rs = Rs_Wm2 * 0.0864  # 1 W/m² = 0.0864 MJ/m²·dia
+	albedo = 0.23
+	Rn = (1 - albedo) * Rs  # MJ/m²·dia
+
+	# 2) Pressões de vapor
+	es = 0.6108 * math.exp((17.27 * T) / (T + 237.3))  # kPa
+	ea = (RH / 100.0) * es  # kPa
+
+	# 3) Declive da curva de vapor
+	delta = (4098 * es) / ((T + 237.3) ** 2)  # kPa/°C
+
+	# 4) Constante psicrométrica fixa
+	gamma = 0.066  # kPa/°C
+
+	# 5) Equação simplificada de Penman-Monteith
+	Eto = (
+				  0.408 * delta * Rn
+				  + gamma * (900.0 / (T + 273.0)) * u2 * (es - ea)
+		  ) / (delta + gamma * (1 + 0.34 * u2))
+
+	return Eto
+
+
+
 def dados_meteorologicos():
-    latitude = -5.6622
-    longitude = -37.7989
+	latitude = -5.6622
+	longitude = -37.7989
 
-    url = (
-        f"https://api.open-meteo.com/v1/forecast?"
-        f"latitude={latitude}&longitude={longitude}"
-        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation,wind_speed_10m"
-    )
+	url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=relative_humidity_2m,shortwave_radiation"
 
-    res = requests.get(url)
+	response = requests.get(BASE_URL, headers=headers)
+	response.raise_for_status()
 
-    if res.status_code == 200:
-        dados = res.json()["current"]
-        temperatura = f"{dados['temperature_2m']} °C"
-        umidade = f"{dados['relative_humidity_2m']} %"
-        radiacao_solar = f"{dados['shortwave_radiation']} W/m²"
-        velocidade_10m = dados['wind_speed_10m']
+	dados = response.json()
+	resultado = {}
 
-        velocidade_2m = velocidade_10m * (4.87 / math.log(67.8 * 10 - 5.42))
-        velocidade_vento_2m = f"{velocidade_2m:.2f} km/h"
+	for sensor in dados:
+		eid = sensor.get("entity_id")
+		if eid in sensor_ids:
+			resultado[sensor_ids[eid]] = sensor.get("state")
 
-        return {
-            "temperatura": temperatura,
-            "umidade": umidade,
-            "radiacao_solar": radiacao_solar,
-            "vento": velocidade_vento_2m
-        }
-    else:
-        return {
-            "temperatura": "---",
+	resposta = {"precipitacao": resultado["precipitacao"],
+				"vento": float(resultado["velocidade_vento"])*3.6,
+				"direcao": resultado["direcao_vento"],
+				"temperatura": resultado["temperatura"],
+				"umidade": resultado["umidade"]}
+
+	temperatura = resposta["temperatura"]
+	velocidade_vento = resposta["vento"]
+
+	res = requests.get(url)
+	if res.status_code == 200:
+		dados = res.json()["current"]
+		umidade = dados['relative_humidity_2m']
+		rad_solar = dados['shortwave_radiation']
+
+        return {"temperatura": temperatura,
+                "umidade": umidade,
+                "radiacao_solar": rad_solar,
+                "vento": velocidade_vento}
+
+    return {"temperatura": "---",
             "umidade": "---",
             "radiacao_solar": "---",
-            "vento": "---"
-        }
-"""
-    try:
-        response = requests.get(BASE_URL, headers=headers)
-        response.raise_for_status()
-
-        dados = response.json()
-        resultado = {}
-
-        for sensor in dados:
-            eid = sensor.get("entity_id")
-            if eid in sensor_ids:
-                resultado[sensor_ids[eid]] = sensor.get("state")
-        resposta = {"precipitacao": resultado["precipitacao"],
-                    "vento": resultado["velocidade_vento"],
-                    "direcao": resultado["direcao_vento"],
-                    "temperatura": resultado["temperatura"],
-                    "umidade": resultado["umidade"]}
-
-        return resposta
-
-    except requests.exceptions.RequestException as e:
-        print("Erro ao conectar com o Home Assistant:", e)
-        return {"precipitacao": "---",
-                "vento": "---",
-                "direcao": "---",
-                "temperatura": "---",
-                "umidade": "---"}
-"""
+            "vento": "---"}
 
 
 def calcular_consumo(kc):
-    estacao = dados_meteorologicos()
+    eto = calcular_eto()
     consumo = {}
     return consumo
 
