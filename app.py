@@ -43,11 +43,6 @@ sensor_ids = {
 
 
 def calcular_eto(T, RH, u2, Rs_Wm2):
-	"""
-     Calcula ET0 simplificado (mm/dia) usando apenas
-     temperatura média (T, °C), umidade (%) ,
-     velocidade do vento u2 (m/s) e radiação Rs (W/m²).
-	"""
 	# 1) Radiação líquida (MJ/m²·dia)
 	Rs = Rs_Wm2 * 0.0864  # 1 W/m² = 0.0864 MJ/m²·dia
 	albedo = 0.23
@@ -95,10 +90,10 @@ def dados_meteorologicos():
         velocidade_vento_2m = f"{velocidade_2m:.2f} km/h"
 
         return {
-            "temperatura": temperatura,
-            "umidade": umidade,
-            "radiacao_solar": radiacao_solar,
-            "vento": velocidade_vento_2m
+            "temperatura": float(temperatura),
+            "umidade": float(umidade),
+            "radiacao_solar": float(radiacao_solar),
+            "vento": float(velocidade_vento_2m)
         }
     else:
         return {
@@ -132,10 +127,12 @@ def dados_meteorologicos():
 """
 
 def calcular_consumo(kc, area):
-    temperatura, umidade, rad_solar, velocidade_vento = dados_meteorologicos()
-    eto = calcular_eto(float(temperatura), float(umidade), float(velocidade_vento),  float(rad_solar))
+    dados = dados_meteorologicos()
+    temperatura, umidade, rad_solar, velocidade_vento = dados["temperatura"], dados["umidade"] ,dados["radiacao_solar"], dados["vento"]
+    eto = calcular_eto(temperatura, umidade, velocidade_vento,  rad_solar)
     etc = eto * kc
     consumo = etc * area
+
     return {"eto": eto,
             "etc": etc,
             "consumo": consumo}
