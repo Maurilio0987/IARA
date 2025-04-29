@@ -81,13 +81,13 @@ def dados_meteorologicos():
 
     if res.status_code == 200:
         dados = res.json()["current"]
-        temperatura = f"{dados['temperature_2m']} °C"
-        umidade = f"{dados['relative_humidity_2m']} %"
-        radiacao_solar = f"{dados['shortwave_radiation']} W/m²"
+        temperatura = f"{dados['temperature_2m']}"
+        umidade = f"{dados['relative_humidity_2m']}"
+        radiacao_solar = f"{dados['shortwave_radiation']}"
         velocidade_10m = dados['wind_speed_10m']
 
         velocidade_2m = velocidade_10m * (4.87 / math.log(67.8 * 10 - 5.42))
-        velocidade_vento_2m = f"{velocidade_2m:.2f} km/h"
+        velocidade_vento_2m = f"{velocidade_2m:.2f}"
 
         return {
             "temperatura": float(temperatura),
@@ -135,7 +135,6 @@ def calcular_consumo(kc, area):
     eto = calcular_eto(temperatura, umidade, velocidade_vento,  rad_solar)
     etc = eto * kc
     consumo = etc * area
-    print(dados)
     return {"eto": eto,
             "etc": etc,
             "consumo": consumo}
