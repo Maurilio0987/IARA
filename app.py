@@ -76,8 +76,38 @@ def dados_meteorologicos():
     latitude = -5.6622
     longitude = -37.7989
 
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=relative_humidity_2m,shortwave_radiation"
+    url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={latitude}&longitude={longitude}"
+        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation,wind_speed_10m"
+    )
 
+    res = requests.get(url)
+
+    if res.status_code == 200:
+        dados = res.json()["current"]
+        temperatura = f"{dados['temperature_2m']} °C"
+        umidade = f"{dados['relative_humidity_2m']} %"
+        radiacao_solar = f"{dados['shortwave_radiation']} W/m²"
+        velocidade_10m = dados['wind_speed_10m']
+
+        velocidade_2m = velocidade_10m * (4.87 / math.log(67.8 * 10 - 5.42))
+        velocidade_vento_2m = f"{velocidade_2m:.2f} km/h"
+
+        return {
+            "temperatura": temperatura,
+            "umidade": umidade,
+            "radiacao_solar": radiacao_solar,
+            "vento": velocidade_vento_2m
+        }
+    else:
+        return {
+            "temperatura": "---",
+            "umidade": "---",
+            "radiacao_solar": "---",
+            "vento": "---"}
+
+"""
     response = requests.get(BASE_URL, headers=headers)
     response.raise_for_status()
 
@@ -99,27 +129,7 @@ def dados_meteorologicos():
 
     temperatura = resposta["temperatura"]
     velocidade_vento = resposta["vento"]
-
-    res = requests.get(url)
-    if res.status_code == 200:
-        dados = res.json()["current"]
-        umidade = dados['relative_humidity_2m']
-        rad_solar = dados['shortwave_radiation']
-
-        return {
-            "temperatura": temperatura,
-            "umidade": umidade,
-            "radiacao_solar": rad_solar,
-            "vento": velocidade_vento
-        }
-    else:
-        return {
-            "temperatura": "---",
-            "umidade": "---",
-            "radiacao_solar": "---",
-            "vento": "---"
-        }
-
+"""
 
 def calcular_consumo(kc):
     eto = calcular_eto()
