@@ -82,7 +82,6 @@
     </header>
 
     <main class="container-grid">
-        <!-- Estação Meteorológica -->
 		<div class="box">
             <h4>Horta</h4>
             <div class="data">Planta: <span>{{ horta.planta }}</span></div>
@@ -93,81 +92,36 @@
         </div>
 
         <div class="box">
-            <h4>Estação Meteorológica</h4>
-            <div class="data">Temperatura: <span id="temperatura">{{ clima.temperatura }}</span></div>
-            <div class="data">Umidade do ar: <span id="umidade">{{ clima.umidade }}</span></div>
-            <div class="data">Radiação solar: <span id="radiacao">{{ clima.radiacao }}</span></div>
-            <div class="data">Velocidade do vento: <span id="vento">{{ clima.vento }}</span></div>
-			<div class="data">ETo: <span id="eto">{{ clima.eto }}</span><span>mm/dia</span></div>
+            <h4>Dados Meteorológicos</h4>
+            <div class="data">Temperatura: <span id="temperatura">---</span><span> °C</span></div>
+            <div class="data">Umidade do ar: <span id="umidade">---</span><span> %</span></div>
+            <div class="data">Radiação solar: <span id="radiacao">---</span><span> W/m²</span></div>
+            <div class="data">Velocidade do vento: <span id="vento">---</span><span> </span></div>
+			<div class="data">ETo: <span id="eto">---</span><span> mm/dia</span></div>
         </div>
-
-        <!-- Gasto de Água -->
+		<div class="box">
+            <h4>Consumo de água no dia</h4>
+            <div class="data"><span id="volume_irrigado">---</span><span> L</span></div>
+        </div>
+		
+		<!---
         <div class="box">
             <h4>Gasto de água</h4>
-            <div class="data">ETc: <span id="etc">{{ gasto.etc }} </span><span>mm/dia</span></div>
-            <div class="data">Volume: <span id="volume">{{ gasto.volume }} </span><span>L/dia</span></div>
+            <div class="data">ETc: <span id="etc">---</span><span> mm/dia</span></div>
+            <div class="data">Volume: <span id="volume">---</span><span> L/dia</span></div>
         </div>
+		--->
 
-
-        <!-- Gráfico de Consumo 
         <div class="box full-width">
-            <h4>Gráfico de gastos de água</h4>
+            <h4>Gráfico de consumo de água</h4>
             <canvas id="graficoAgua"></canvas>
-        </div> -->
+        </div>
 
     </main>
 	
 	<script src="/static/js/horta.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        function gerarGraficoConsumo(dias, valores) {
-            const ctx = document.getElementById('graficoAgua').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dias,
-                    datasets: [{
-                        label: 'Consumo de água (L/dia)',
-                        data: valores,
-                        borderColor: '#4caf50',
-                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: true
-                        },
-                        tooltip: {
-                            enabled: true
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Litros'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Dias da semana'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-		
-        // Exemplo de uso da função (valores simulados)
-        const diasSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-        const consumoSimulado = [120, 300, 125, 140, 135, 128, 132];
-        gerarGraficoConsumo(diasSemana, consumoSimulado);
-    </script>
+    
+
 </body>
 </html>

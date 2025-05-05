@@ -65,8 +65,11 @@ class DatabaseManager:
             duracao INT NOT NULL,
             solo_id INT NOT NULL,
             estagio_id INT NOT NULL,
+            historico JSON NOT NULL,
             chave VARCHAR(36) UNIQUE NOT NULL DEFAULT (UUID()),
-            estado ENUM('Ligado', "Desligado") NOT NULL,
+            volume FLOAT DEFAULT 0,
+            volume_irrigado FLOAT DEFAULT 0,
+            
 
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
             FOREIGN KEY (solo_id) REFERENCES solos(id),
@@ -232,12 +235,74 @@ class DatabaseManager:
 
         return estagio_id
 
-
+    def chaves(self):
+        query = "SELECT chave FROM hortas;"
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        cursor.execute(query)
+        chaves = cursor.fetchall()
+        cursor.close()
+        conexão.close()
+        return chaves
+    
+    
+    def volumes(self, chave):
+        query = "SELECT volume, volume_irrigado FROM hortas WHERE chave=%s;"
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        cursor.execute(query, (chave,))
+        volumes = cursor.fetchone()
+        cursor.close()
+        conexão.close()
+        return volumes
+    
+    def adicionar_volume_irrigado(self, chave, valor):
+        query = "UPDATE hortas SET volume_irrigado = volume + %s WHERE chave = %s;"
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        cursor.execute(query, (valor, chave,))
+        cursor.close()
+        conexão.close()
+    
+    
+    def adicionar_volume(self, chave, valor):
+        query = "UPDATE hortas SET volume = volume + %s WHERE chave = %s;"
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        cursor.execute(query, (valor, chave,))
+        cursor.close()
+        conexão.close()
+    
+    def zerar_volumes(self, chave):
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        
+        query = "UPDATE horta SET historico = JSON_ARRAY_APPEND(JSON_REMOVE(historico, '$[0]'), '$', volume_irrigado) WHERE chave = %s;"
+        cursor.execute(query, (chave, ))
+        
+        
+        query = "UPDATE hortas SET volume_irrigado = 0 AND volume = 0 WHERE chave = %s;"
+        cursor.execute(query, (chave, ))
+        cursor.close()
+        conexão.close()
+    
+    
+    def historico(self, chave):
+        query = "SELECT historico, volume_irrigado FROM hortas WHERE chave=%s;"
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        cursor.execute(query, (chave,))
+        historico = cursor.fetchone()
+        cursor.close()
+        conexão.close()
+        return historico
+    
+    
     def adicionar_horta(self, usuario, nome, tamanho, cultura, solo, tempo):
         estagio_id = self.estagio(cultura, tempo)
         if estagio_id != None:
-            self.executar(f"""INSERT INTO hortas (usuario_id, nome, tamanho, duracao, solo_id, estagio_id, estado) VALUES 
-                            ({usuario}, '{nome}', {tamanho}, {tempo}, {solo}, {estagio_id}, 'Desligado')""")
+            self.executar(f"""INSERT INTO hortas (usuario_id, nome, tamanho, duracao, solo_id, estagio_id, historico) VALUES 
+                            ({usuario}, '{nome}', {tamanho}, {tempo}, {solo}, {estagio_id}, '[0, 0, 0, 0, 0, 0]');""")
             return True
         return False
     
@@ -276,22 +341,6 @@ class DatabaseManager:
 
         cursor.close()
         conexao.close()
-    
-    def estado_horta(self, chave_horta):
-        conexao = self.conectar_banco_de_dados()
-        cursor = conexao.cursor()
-        
-        query = "SELECT estado FROM hortas WHERE chave = %s;"
-        cursor.execute(query, (chave_horta))
-        estado = cursor.fetchone()
-        
-        cursor.close()
-        conexao.close()
-        
-        if estado == "Ligado":
-            return True
-        return False
-        
         
     def tabela(self, nome_tabela):
         query = f"SELECT * FROM {nome_tabela};"
@@ -335,4 +384,5 @@ class DatabaseManager:
 if __name__ == "__main__":
     db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
     db = DatabaseManager(db_url)
+    #db.executar("drop table hortas")
     

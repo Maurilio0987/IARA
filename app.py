@@ -5,6 +5,8 @@ from banco_de_dados import DatabaseManager, sha256
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import math
+from pytz import timezone
+
 
 
 app = Flask(__name__)
@@ -32,9 +34,6 @@ sensor_ids = {
 }
 
 
-#scheduler = BackgroundScheduler()
-#scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0)
-#scheduler.start()
 
 
 #                 #
@@ -43,28 +42,20 @@ sensor_ids = {
 
 
 def calcular_eto(T, RH, u2, Rs_Wm2):
-	# 1) Radiação líquida (MJ/m²·dia)
-	Rs = Rs_Wm2 * 0.0864  # 1 W/m² = 0.0864 MJ/m²·dia
+	Rs = Rs_Wm2 * 0.0864
 	albedo = 0.23
-	Rn = (1 - albedo) * Rs  # MJ/m²·dia
-
-	# 2) Pressões de vapor
-	es = 0.6108 * math.exp((17.27 * T) / (T + 237.3))  # kPa
-	ea = (RH / 100.0) * es  # kPa
-
-	# 3) Declive da curva de vapor
-	delta = (4098 * es) / ((T + 237.3) ** 2)  # kPa/°C
-
-	# 4) Constante psicrométrica fixa
-	gamma = 0.066  # kPa/°C
-
-	# 5) Equação simplificada de Penman-Monteith
+	Rn = (1 - albedo) * Rs
+	es = 0.6108 * math.exp((17.27 * T) / (T + 237.3))
+	ea = (RH / 100.0) * es
+	delta = (4098 * es) / ((T + 237.3) ** 2)  
+	gamma = 0.066
+    
 	Eto = (
 				  0.408 * delta * Rn
 				  + gamma * (900.0 / (T + 273.0)) * u2 * (es - ea)
 		  ) / (delta + gamma * (1 + 0.34 * u2))
 
-	return round(Eto)
+	return round(Eto, 2)
 
 
 def dados_meteorologicos():
@@ -126,18 +117,52 @@ def dados_meteorologicos():
     velocidade_vento = resposta["vento"]
 """
 
-def calcular_consumo(kc, area):
+def calcular_consumo(chave):    
+    horta = db.horta(chave)
+    kc = horta[8]
+    area = horta[2]
+
+
     dados = dados_meteorologicos()
+    if dados["temperatura"] == "---": return {"eto": "---",
+                                             "etc": "---",
+                                             "consumo": "---"} 
     temperatura = dados["temperatura"]
     umidade = dados["umidade"]
     rad_solar = dados["radiacao_solar"]
     velocidade_vento = dados["vento"]
-    eto = calcular_eto(temperatura, umidade, velocidade_vento,  rad_solar)
+    
+    
+    eto = calcular_eto(temperatura, umidade, velocidade_vento, rad_solar)
     etc = eto * kc
     consumo = etc * area
+    
     return {"eto": eto,
             "etc": etc,
-            "consumo": consumo}
+            "consumo": round(consumo/24, 2)}
+
+
+def atualizar_volumes():
+    chaves = db.chaves()
+    for chave in chaves:            
+        consumo = calcular_consumo(chave)
+        if consumo["consumo"] == "---": consumo["consumo"] = 0
+        db.adicionar_volume(chave, consumo["consumo"])
+
+
+
+
+
+
+
+
+
+#scheduler = BackgroundScheduler(timezone=timezone("America/Sao_Paulo"))
+#scheduler.add_job(atualizar_volumes, "cron", minute=0, id="volume_por_hora")
+#scheduler.add_job(db.zerar_volumes, "cron", hour=0, minute=0, second=0, id="zerar_volumes_diario")
+#scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0, id="atualizar_hortas_diario")
+#scheduler.start()
+
 
 
 #                  #
@@ -218,6 +243,17 @@ def cadastrar():
     return redirect(url_for("cadastro"))
 
 
+
+
+
+
+
+
+
+
+
+
+
 #                #   
 #-----HORTAS-----#
 #                #
@@ -229,32 +265,7 @@ def hortas():
     culturas = db.culturas()
     solos = db.solos()
     return render_template("hortas.html", solos=solos, culturas=culturas)
-   
-   
-@app.route("/hortas/<chave>")
-@login_required
-def horta(chave):
-    horta = db.horta(chave)
-    return render_template("horta.html", horta={
-        "nome": horta[1],
-        "planta": horta[3],
-        "solo": horta[4],
-        "estagio": horta[6],
-        "tempo": horta[7],
-        "area": horta[2]
-    },
-    clima={
-        "temperatura": "---",
-        "umidade": "---",
-        "vento": "---",
-        "radiacao": "---",
-        "eto": "---",
-    },
-    gasto={
-        "etc": "---",
-        "volume": "---"
-    })
-
+ 
 
 @app.route("/cadastrar_horta", methods=["POST"])
 def cadastrar_horta():
@@ -273,31 +284,81 @@ def cadastrar_horta():
 @app.route("/atualizar_hortas")
 def atualizar_hortas():
     return jsonify(db.hortas(session["email"]))
+    
 
 
-@app.route("/esp32/estado/<chave>")
-def estado(chave):
-    estado = {"estado": db.estado(chave)}
-    return jsonify(estado)
+
+
+#               #
+#-----HORTA-----#
+#               #
+
+
+
+@app.route("/hortas/<chave>")
+@login_required
+def horta(chave):
+    horta = db.horta(chave)
+    return render_template("horta.html", horta={
+        "nome": horta[1],
+        "planta": horta[3],
+        "solo": horta[4],
+        "estagio": horta[6],
+        "tempo": horta[7],
+        "area": horta[2]})
 
 
 @app.route("/consumo/<chave>")
 def consumo(chave):
-    horta = db.horta(chave)
-    kc = horta[8]
-    area = horta[2]
-
-    return jsonify(calcular_consumo(kc, area))
+    return jsonify(calcular_consumo(chave))
 
 
-#                 #
-#-----ESTAÇÃO-----#
-#                 #
+@app.route("/historico/<chave>")
+def historico(chave):
+    return jsonify(db.historico(chave))
 
 
 @app.route("/estacao")
 def estacao():
     return jsonify(dados_meteorologicos())
+
+
+
+#               #
+#-----ESP32-----#
+#               #
+
+
+@app.route('/esp32/<chave>/volume')
+def volume(chave):
+    volumes = db.volumes(chave)
+    if volumes:
+        return jsonify({'volume': volumes[0],
+                        'volume_irrigado': volumes[1],
+                        "erro": "sem erro"}), 200
+    return jsonify({'erro': 'Horta não encontrada'}), 404
+
+
+@app.route('/esp32/<chave>/irrigado', methods=["POST"])
+def volume_irrigado(chave):
+    dados = request.json
+    volume_irrigado = dados.get("volume_irrigado")
+    db.adicionar_volume_irrigado(chave, volume_irrigado)
+
+    return {"status": "Sucesso"}, 200
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #             #
@@ -336,6 +397,14 @@ def adicionar_solo():
     
     db.adicionar_solo(nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica)
     return redirect(url_for("admin/solos"))
+
+
+
+
+
+
+
+
 
 
 #app.run(debug=True, host="localhost", port=80)
