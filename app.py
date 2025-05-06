@@ -276,6 +276,7 @@ def cadastrar_horta():
     solo = dados.get("solo")
     tempo = int(dados.get("tempo"))
     usuario = db.usuario(session["email"])
+    print(usuario, nome)	
     db.adicionar_horta(usuario, nome, tamanho, cultura, solo, tempo)
     
     return {"status": "Sucesso"}, 200
