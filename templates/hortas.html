@@ -305,7 +305,6 @@
     </footer>
     <script src="./static/js/hortas.js"></script>
     <script>
-        
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
@@ -322,28 +321,7 @@
         function closeModal() {
             document.getElementById('hortaModal').classList.add('hidden');
         }
-        
-        function cadastrarHorta() {
-            
-            const nome = document.getElementById('nome').value;
-            const tamanho = document.getElementById('tamanho').value;
-            const cultura = document.getElementById('cultura').value;
-            const solo = document.getElementById('solo').value;
-            const tempo = document.getElementById('tempo').value;
-            
-            
-            console.log({nome, tamanho, cultura, solo, tempo});
-            
-            
-            closeModal();
-            
-            
-            alert('Horta cadastrada com sucesso!');
-            
-            
-        }
-        
-        
+
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const menuButton = document.querySelector('.sm-hiddens button');
