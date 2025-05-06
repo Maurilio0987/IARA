@@ -283,7 +283,9 @@ def cadastrar_horta():
 
 @app.route("/atualizar_hortas")
 def atualizar_hortas():
-    return jsonify(db.hortas(session["email"]))
+    hortas = db.hortas(session["email"])
+    print(hortas)
+    return jsonify(hortas)
     
 
 
