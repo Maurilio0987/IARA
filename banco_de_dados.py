@@ -147,7 +147,7 @@ class DatabaseManager:
     
     def hortas(self, email):
         query = """
-        SELECT hortas.id, hortas.nome, hortas.chave
+        SELECT hortas.id, hortas.nome, hortas.chave, hortas.tamanho, culturas.nome, solo.nome
         FROM hortas
         JOIN usuarios ON hortas.usuario_id = usuarios.id
         JOIN estagios on hortas.estagio_id = estagios.id
