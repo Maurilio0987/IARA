@@ -162,7 +162,6 @@
                     </div>
                 </div>
                 
-                <!-- Mobile menu button -->
                 <div class="sm:hidden">
                     <button onclick="toggleSidebar()" class="text-white focus:outline-none">
                         <i class="fas fa-bars text-xl"></i>
@@ -171,8 +170,6 @@
             </div>
         </div>
     </nav>
-    
-    <!-- Mobile Sidebar -->
     <div class="sidebar" id="sidebar">
         <ul class="space-y-4 p-4">
             <li><a href="sobre" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Sobre</a></li>
@@ -181,10 +178,10 @@
         </ul>
     </div>
     
-    <!-- Overlay for sidebar -->
+  
     <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" onclick="toggleSidebar()"></div>
     
-    <!-- Main Content -->
+    
     <div class="main-content">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 animate-fade-in" style="animation-delay: 0.2s;">
             <div class="flex justify-between items-center mb-8">
@@ -194,9 +191,9 @@
                 </button>
             </div>
             
-            <!-- Hortas List -->
+            
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Sample Horta Card -->
+               
                 <div class="bg-white rounded-lg card p-6 cursor-pointer hover:shadow-md">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-xl font-semibold text-emerald-800">Horta Principal</h3>
@@ -222,11 +219,11 @@
                     </div>
                 </div>
                 
-                <!-- Add more horta cards here -->
+                
             </div>
         </div>
         
-        <!-- Modal for adding new horta -->
+        
         <div id="hortaModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div id="modalOverlay" class="fixed inset-0 transition-opacity overlay" aria-hidden="true">
@@ -293,7 +290,7 @@
         </div>
     </div>
     
-    <!-- Footer - AGORA NO FINAL DA PÁGINA COMO DEVERIA SER -->
+    
     <footer class="bg-gray-100 border-t border-gray-200 mt-auto animate-fade-in" style="animation-delay: 0.4s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
@@ -309,7 +306,7 @@
     </footer>
     
     <script>
-        // Sidebar functions
+        
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
@@ -318,7 +315,7 @@
             overlay.classList.toggle('hidden');
         }
         
-        // Modal functions
+        
         function openModal() {
             document.getElementById('hortaModal').classList.remove('hidden');
         }
@@ -328,26 +325,26 @@
         }
         
         function cadastrarHorta() {
-            // Get form values
+            
             const nome = document.getElementById('nome').value;
             const tamanho = document.getElementById('tamanho').value;
             const cultura = document.getElementById('cultura').value;
             const solo = document.getElementById('solo').value;
             const tempo = document.getElementById('tempo').value;
             
-            // Here you would typically send this data to your backend
+            
             console.log({nome, tamanho, cultura, solo, tempo});
             
-            // Close modal after submission
+            
             closeModal();
             
-            // Show success message
+            
             alert('Horta cadastrada com sucesso!');
             
-            // In a real app, you would refresh the hortas list here
+            
         }
         
-        // Close sidebar when clicking outside
+        
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const menuButton = document.querySelector('.sm-hiddens button');
