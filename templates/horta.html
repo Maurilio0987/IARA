@@ -253,9 +253,9 @@
             </div>
         </div>
     </footer>
-    
+    <script src="/static/js/horta.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        
         function updateDateTime() {
             const now = new Date();
             document.getElementById('current-time').textContent = now.toLocaleTimeString();
@@ -272,52 +272,6 @@
             sidebar.classList.toggle('active');
             overlay.classList.toggle('hidden');
         }
-        
-        
-        const ctx = document.getElementById('graficoAgua').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-                datasets: [{
-                    label: 'Consumo de Água (L)',
-                    data: [0, 15, 30, 45, 60, 75],
-                    backgroundColor: 'rgba(5, 150, 105, 0.2)',
-                    borderColor: 'rgba(5, 150, 105, 1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        
-        
-        function simulateSensorData() {
-            document.getElementById('temperatura').textContent = (25 + Math.random() * 5).toFixed(1);
-            document.getElementById('umidade').textContent = (50 + Math.random() * 20).toFixed(0);
-            document.getElementById('radiacao').textContent = (300 + Math.random() * 500).toFixed(0);
-            document.getElementById('vento').textContent = (5 + Math.random() * 10).toFixed(1);
-            document.getElementById('eto').textContent = (3 + Math.random() * 2).toFixed(1);
-            document.getElementById('volume_irrigado').textContent = (60 + Math.random() * 30).toFixed(0);
-        }
-        
-        
-        setInterval(simulateSensorData, 5000);
-        simulateSensorData();
     </script>
 </body>
 </html>
