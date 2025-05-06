@@ -257,7 +257,7 @@ class DatabaseManager:
         return volumes
     
     def adicionar_volume_irrigado(self, chave, valor):
-        query = "UPDATE hortas SET volume_irrigado = volume + %s WHERE chave = %s;"
+        query = "UPDATE hortas SET volume_irrigado = volume_irrigado + %s WHERE chave = %s;"
         conexão = self.conectar_banco_de_dados()
         cursor = conexão.cursor()
         cursor.execute(query, (valor, chave,))
