@@ -41,21 +41,23 @@ sensor_ids = {
 #                 #
 
 
-def calcular_eto(T, RH, u2, Rs_Wm2):
-	Rs = Rs_Wm2 * 0.0864
-	albedo = 0.23
-	Rn = (1 - albedo) * Rs
-	es = 0.6108 * math.exp((17.27 * T) / (T + 237.3))
-	ea = (RH / 100.0) * es
-	delta = (4098 * es) / ((T + 237.3) ** 2)  
-	gamma = 0.066
-    
-	Eto = (
-				  0.408 * delta * Rn
-				  + gamma * (900.0 / (T + 273.0)) * u2 * (es - ea)
-		  ) / (delta + gamma * (1 + 0.34 * u2))
+def calcular_eto(temperatura_C, umidade_relativa, velocidade_vento_m_s, radiacao_solar_W_m2):
+    radiacao_solar_MJ_m2_dia = radiacao_solar_W_m2 * 0.0864
+    albedo_cultivo = 0.23
+    radiacao_liquida = (1 - albedo_cultivo) * radiacao_solar_MJ_m2_dia
 
-	return round(Eto, 2)
+    pressao_vapor_saturado = 0.6108 * math.exp((17.27 * temperatura_C) / (temperatura_C + 237.3))
+    pressao_vapor_real = (umidade_relativa / 100.0) * pressao_vapor_saturado
+
+    declividade_curva_pressao_vapor = (4098 * pressao_vapor_saturado) / ((temperatura_C + 237.3) ** 2)
+    constante_psicrometrica = 0.066  # valor típico
+
+    eto = (
+        0.408 * declividade_curva_pressao_vapor * radiacao_liquida
+        + constante_psicrometrica * (900.0 / (temperatura_C + 273.0)) * velocidade_vento_m_s * (pressao_vapor_saturado - pressao_vapor_real)
+    ) / (declividade_curva_pressao_vapor + constante_psicrometrica * (1 + 0.34 * velocidade_vento_m_s))
+
+    return round(eto, 2)
 
 
 def dados_meteorologicos():
@@ -409,9 +411,9 @@ def adicionar_solo():
 
 
 
-app.run(debug=True, host="localhost", port=80)
+#app.run(debug=True, host="localhost", port=80)
 
 
-#if __name__ == "__main__":
-#    port = int(os.environ.get("PORT", 5000))
-#    app.run(host="0.0.0.0", port=port)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
