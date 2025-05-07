@@ -41,9 +41,8 @@ function atualizar_historico() {
   .then(data => {
 	const diasSemana = ['Há 6 dias', 'Há 5 dias', 'Há 4 dias', 'Há 3 dias', 'Há 2 dias', 'Ontem', 'Hoje'];
 	data[0] = JSON.parse(data[0]);
-	console.log([data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[1]])
-	const consumoSimulado = [data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[1]];
-	gerarGraficoConsumo(diasSemana, consumoSimulado);
+	const consumo = [data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[1]];
+	gerarGraficoConsumo(diasSemana, consumo);
 
 	})
 
@@ -69,6 +68,7 @@ function gerarGraficoConsumo(dias, valores) {
       },
       options: {
 			responsive: true,
+         maintainAspectRatio: false,
 			plugins: {
 				legend: {
 					display: true
@@ -113,7 +113,7 @@ function atualizar_consumo24() {
 
 	 
 	 elemento_eto.innerHTML = " " + data["volume_irrigado"];
-	 animateVolume(float(data["volume_irrigado"]));
+	 animateVolume(document.getElementById("volume_irrigado"), data["volume_irrigado"]);
 
 	})
 	
@@ -149,8 +149,8 @@ function atualizar_estacao() {
   });
 }
 
-function animateVolume(finalValue) {
-	const span = document.getElementById("volume_irrigado");
+function animateVolume(element, finalValue) {
+	const span = element;
 	let current = 0;
 	const duration = 1500;
 	const increment = finalValue / (duration / 30);

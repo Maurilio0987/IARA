@@ -201,7 +201,8 @@ def login_required(f):
 
 @app.route("/")
 def index():
-    if session.get("email"): return redirect(url_for("hortas"))
+    if session.get("email") == "admin@admin": return redirect(url_for("admin"))
+    elif session.get("email"): return redirect(url_for("hortas"))
     return render_template("index.html")
 
 
@@ -276,7 +277,6 @@ def cadastrar_horta():
     solo = dados.get("solo")
     tempo = int(dados.get("tempo"))
     usuario = db.usuario(session["email"])
-    print(usuario, nome)	
     db.adicionar_horta(usuario, nome, tamanho, cultura, solo, tempo)
     
     return {"status": "Sucesso"}, 200
@@ -285,7 +285,6 @@ def cadastrar_horta():
 @app.route("/atualizar_hortas")
 def atualizar_hortas():
     hortas = db.hortas(session["email"])
-    print(hortas)
     return jsonify(hortas)
     
 
@@ -399,7 +398,7 @@ def adicionar_solo():
     cond_hidraulica = request.form["cond_hidraulica"]
     
     db.adicionar_solo(nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica)
-    return redirect(url_for("admin/solos"))
+    return redirect(url_for("solos"))
 
 
 
@@ -410,9 +409,9 @@ def adicionar_solo():
 
 
 
-#app.run(debug=True, host="localhost", port=80)
+app.run(debug=True, host="localhost", port=80)
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+#    port = int(os.environ.get("PORT", 5000))
+#    app.run(host="0.0.0.0", port=port)

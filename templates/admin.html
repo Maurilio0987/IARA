@@ -111,11 +111,15 @@
         .dashboard-card:hover {
             transform: scale(1.03);
         }
+		
+		.gradient-bg {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
-    
-    <nav class="bg-emerald-800 shadow-md animate-fade-in fixed-nav">
+
+    <nav class="gradient-bg shadow-md animate-fade-in fixed-nav">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
@@ -128,9 +132,9 @@
                 
                 <div class="hidden sm:block">
                     <div class="flex space-x-8">
-                        <a href="sobre" class="text-white font-medium navbar-link">Sobre</a>
-                        <a href="contato" class="text-white font-medium navbar-link">Contato</a>
-                        <a href="ajuda" class="text-white font-medium navbar-link">Ajuda</a>
+                        <a href="/sobre" class="text-white font-medium navbar-link">Sobre</a>
+                        <a href="/contato" class="text-white font-medium navbar-link">Contato</a>
+                        <a href="/ajuda" class="text-white font-medium navbar-link">Ajuda</a>
                     </div>
                 </div>
                 
@@ -145,10 +149,10 @@
     
     <div class="sidebar" id="sidebar">
         <ul class="space-y-4 p-4">
-            <li><a href="sobre" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Sobre</a></li>
-            <li><a href="contato" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Contato</a></li>
-            <li><a href="ajuda" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Ajuda</a></li>
-        </ul>
+            <li><a href="/sobre" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Sobre</a></li>
+            <li><a href="/contato" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Contato</a></li>
+            <li><a href="/ajuda" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Ajuda</a></li>
+		</ul>
     </div>
     
     <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" onclick="toggleSidebar()"></div>
