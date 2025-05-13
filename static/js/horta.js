@@ -107,12 +107,15 @@ function atualizar_consumo24() {
     return response.json(); // ou response.text() se for texto
   })
   .then(data => {
-     console.log(data);
-	 let elemento_eto = document.getElementById("volume_irrigado");
-	 
+    console.log(data);
+	 let elemento_irrigado = document.getElementById("volume_irrigado");
+	 let elemento_pendente = document.getElementById("volume");
 
 	 
-	 elemento_eto.innerHTML = " " + data["volume_irrigado"];
+	 elemento_pendente.innerHTML = String(Number(data["volume"]) + Number(data["volume_irrigado"]));
+	 elemento_irrigado.innerHTML = data["volume_irrigado"];
+	 
+	 animateVolume(document.getElementById("volume"), data["volume"]);
 	 animateVolume(document.getElementById("volume_irrigado"), data["volume_irrigado"]);
 
 	})

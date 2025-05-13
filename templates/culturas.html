@@ -1,162 +1,158 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IARA - Gerenciar Culturas</title>
-  <link rel="icon" href="/static/imgs/icone.png" type="image/png">
-  <link rel="icon" href="/static/imgs/icone.ico" type="image/x-icon">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f4f7fc;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-    .top-bar {
-      background-color: #03491a;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; z-index: 1000;
-    }
-    .logo { font-size: 24px; font-weight: bold; }
-    .subtitle { font-size: 16px; margin-top: 5px; }
-    .navbar ul {
-      list-style: none;
-      display: flex;
-      gap: 20px;
-      margin: 0; padding: 0;
-    }
-    .navbar ul li a {
-      color: white;
-      text-decoration: none;
-      font-size: 16px;
-      transition: color .3s;
-    }
-    .navbar ul li a:hover { color: #b0e57e; }
-
-    .content-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 120px 20px 40px;
-    }
-    h2 {
-      color: #03491a;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .flashcard-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      justify-content: center;
-    }
-    .flashcard {
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      width: 280px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-    .flashcard h3 {
-      color: #03491a;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    .flashcard-body {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    .flashcard-body img {
-      width: 60px;
-      height: 60px;
-      object-fit: contain;
-    }
-    .flashcard-data p {
-      margin: 4px 0;
-      font-size: 0.95em;
-      color: #333;
-    }
-    .add-card {
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-    }
-    .add-card .add-icon {
-      font-size: 48px;
-      color: #03491a;
-      line-height: 1;
-    }
-    .flashcard.add-card {
-      display: flex;
-      background: #e0f7fa;
-      color: #03491a;
-    }
-
-    .btn-exit {
-      display: inline-block;
-      margin: 40px auto 0;
-      padding: 10px 20px;
-      background-color: #198754;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 16px;
-      transition: background-color .3s;
-    }
-    .btn-exit:hover { background-color: #146c43; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de administrador</title>
+    <link rel="icon" href="/static/imgs/icone.png" type="image/png">
+    <link rel="icon" href="/static/imgs/icone.ico" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .table-container {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .table-row-hover:hover {
+            background-color: #f0fdf4;
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+        
+        .form-input {
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .form-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .btn-submit {
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+        }
+        
+        /* Adicionando animação suave para a página */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+		
+		.gradient-bg {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+        }
+    </style>
 </head>
-<body>
-  <header class="top-bar">
-    <div>
-      <div class="logo">IARA</div>
-      <div class="subtitle">Irrigação Agrícola com Resposta Automática</div>
-    </div>
-    <nav class="navbar">
-      <ul>
-        <li><a href="/sobre">Sobre</a></li>
-        <li><a href="/contato">Contato</a></li>
-        <li><a href="/ajuda">Ajuda</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <div class="content-container">
-    <h2>Gerenciar Culturas</h2>
-    <div class="flashcard-container">
-      {% for cultura in tabela %}
-      <div class="flashcard">
-        <h3>{{ cultura[0] }}</h3>
-        <div class="flashcard-body">
-          <img src="/static/imgs/{{ cultura[0]|lower }}.png" alt="{{ cultura[0] }}">
-          <div class="flashcard-data">
-            <p><strong>Estágio:</strong> {{ cultura[1] }}</p>
-            <p><strong>Duração:</strong> {{ cultura[2] }} dias</p>
-            <p><strong>Kc:</strong> {{ cultura[3] }}</p>
-          </div>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+	<nav class="gradient-bg shadow-md animate-fade-in fixed-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-leaf text-white text-2xl mr-2"></i>
+                        <span class="text-white font-semibold text-xl">Administração de Culturas</span>
+                    </div>
+                </div>
+                <div>
+                    <a href="/admin" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-800 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-150 ease-in-out">
+                        <i class="fas fa-arrow-left mr-2"></i> Voltar
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-      {% endfor %}
+    </nav>
 
-      <div class="flashcard add-card" onclick="location.href='/admin/culturas/adicionar'">
-        <div class="add-icon">+</div>
-      </div>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		<form id="formulario" action="/admin/adicionar_cultura" method="POST" class="bg-white p-4 shadow rounded mb-6">
+			<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+				<input type="text" name="nome" placeholder="Nome da cultura" required class="form-input px-3 py-2 rounded" />
+				<input type="text" name="estagio" placeholder="Estágio" required class="form-input px-3 py-2 rounded" />
+				<input type="number" name="duracao" placeholder="Duração (dias)" required class="form-input px-3 py-2 rounded" />
+				<input type="number" step="0.01" name="kc" placeholder="Kc" required class="form-input px-3 py-2 rounded" />
+			</div>
+			
+            <div class="flex justify-end">
+                <button type="submit" class="btn-submit inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                    <i class="fas fa-plus-circle mr-2"></i> Adicionar Cultura
+                </button>
+            </div>
+		</form>
+
+        <!-- Table Section -->
+        <div class="bg-white shadow rounded-lg overflow-hidden animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900">Solos Cadastrados</h2>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+			
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-emerald-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Cultura</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Estágio</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Duração (dias)</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Kc</th>
+							<th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Excluir</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+						{% for cultura in tabela %}
+							<tr class="table-row">
+								{% if loop.first or cultura[0] != tabela[loop.index0 - 1][0] %}
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center" rowspan="{{ cultura[-1] }}">{{ cultura[0] }}</td>
+								{% endif %}
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ cultura[1] }}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ cultura[2] }}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ cultura[3] }}</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"><button onclick="window.location.href='remover_cultura/{{ cultura[4] }}'">X</button></td>
+								
+							</tr>
+						{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div style="text-align:center">
-      <a href="/admin" class="btn-exit">Voltar</a>
-    </div>
-  </div>
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-12 animate-fade-in" style="animation-delay: 0.4s;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-leaf text-emerald-600 text-xl mr-2"></i>
+                    <span class="text-gray-700 font-medium">Sistema IARA</span>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <p class="text-gray-500 text-sm">© 2025 Todos os direitos reservados</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+	<script src="https://cdn.tailwindcss.com"></script>
 </body>
 </html>

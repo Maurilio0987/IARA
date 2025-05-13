@@ -290,6 +290,10 @@ def atualizar_hortas():
     return jsonify(hortas)
     
 
+@app.route("/remover/<chave>")
+def remover(chave):
+    db.remover_horta(chave)
+    return redirect(url_for("hortas"))
 
 
 
@@ -322,9 +326,11 @@ def historico(chave):
     return jsonify(db.historico(chave))
 
 
+
 @app.route("/estacao")
 def estacao():
     return jsonify(dados_meteorologicos())
+
 
 
 
@@ -381,6 +387,23 @@ def admin():
 def culturas():
     tabela = db.tabela("culturas")
     return render_template("culturas.html", tabela=tabela)
+
+    
+@app.route("/admin/adicionar_cultura", methods=["POST"])
+def adicionar_cultura():
+    nome = request.form["nome"]
+    estagio = request.form["estagio"]
+    duracao = request.form["duracao"]
+    kc = request.form["kc"]
+    
+    db.adicionar_cultura(nome, estagio, duracao, kc)
+    return redirect(url_for("culturas"))
+
+
+@app.route("/admin/remover_cultura/<id>")
+def remover_cultura(id):
+    db.remover_cultura(id)
+    return redirect(url_for("culturas"))
     
 
 @app.route("/admin/solos")
@@ -411,9 +434,9 @@ def adicionar_solo():
 
 
 
-#app.run(debug=True, host="localhost", port=80)
+app.run(debug=True, host="localhost", port=80)
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+#    port = int(os.environ.get("PORT", 5000))
+#    app.run(host="0.0.0.0", port=port)

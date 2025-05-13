@@ -189,8 +189,64 @@ class DatabaseManager:
         conexão.close()
         
         return horta
-        
-        
+    
+    
+    def remover_horta(self, chave):
+        query = "DELETE FROM hortas WHERE chave = %s"
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+        cursor.execute(query, (chave,))
+        cursor.close()
+        conexão.close()
+
+
+
+    def remover_cultura(self, id):
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+
+        # Obtém o cultura_id do estágio
+        cursor.execute("SELECT cultura_id FROM estagios WHERE id = %s", (id,))
+        resultado = cursor.fetchone()
+        if not resultado:
+            cursor.close()
+            conexão.close()
+            raise ValueError("Estágio não encontrado.")
+
+        cultura_id = resultado[0]
+
+        # Remove o estágio
+        cursor.execute("DELETE FROM estagios WHERE id = %s", (id,))
+        conexão.commit()
+
+        # Verifica se ainda há estágios para essa cultura
+        cursor.execute("SELECT COUNT(*) FROM estagios WHERE cultura_id = %s", (cultura_id,))
+        quantidade = cursor.fetchone()[0]
+
+        if quantidade == 0:
+            # Remove a cultura se não houver mais estágios
+            cursor.execute("DELETE FROM culturas WHERE id = %s", (cultura_id,))
+        else:
+            # Reordena os números dos estágios restantes
+            cursor.execute(
+                "SELECT id FROM estagios WHERE cultura_id = %s ORDER BY numero_estagio",
+                (cultura_id,)
+            )
+            estagios_restantes = cursor.fetchall()
+
+            for novo_numero, (estagio_id,) in enumerate(estagios_restantes, start=1):
+                cursor.execute(
+                    "UPDATE estagios SET numero_estagio = %s WHERE id = %s",
+                    (novo_numero, estagio_id)
+                )
+
+        cursor.close()
+        conexão.close()
+
+
+
+
+    
     def culturas(self):
         query = "SELECT MIN(id) AS id, nome FROM culturas GROUP BY nome;"
         conexão = self.conectar_banco_de_dados()
@@ -350,6 +406,7 @@ class DatabaseManager:
                                                     estagio.nome AS estagio,
                                                     estagio.duracao,
                                                     estagio.kc,
+                                                    estagio.id,
                                                     sub.qtd_estagios
                                                 FROM culturas cultura
                                                 JOIN estagios estagio ON cultura.id = estagio.cultura_id
@@ -377,6 +434,44 @@ class DatabaseManager:
         self.executar(query)
 
 
+    def adicionar_cultura(self, nome, estagio, duracao, kc):
+        conexão = self.conectar_banco_de_dados()
+        cursor = conexão.cursor()
+
+        nome = nome.capitalize()
+        estagio = estagio.capitalize()
+        
+        # Verifica se a cultura já existe
+        cursor.execute("SELECT id FROM culturas WHERE nome = %s", (nome,))
+        cultura_existente = cursor.fetchone()
+
+        if cultura_existente:
+            cultura_id = cultura_existente[0]
+        else:
+            # Insere a nova cultura
+            cursor.execute("INSERT INTO culturas (nome) VALUES (%s)", (nome,))
+            conexão.commit()
+
+            # Recupera o ID da nova cultura
+            cursor.execute("SELECT id FROM culturas WHERE nome = %s ORDER BY id DESC LIMIT 1", (nome,))
+            cultura_id = cursor.fetchone()[0]
+
+        # Determina o próximo número de estágio
+        cursor.execute("SELECT MAX(numero_estagio) FROM estagios WHERE cultura_id = %s", (cultura_id,))
+        ultimo_estagio = cursor.fetchone()
+        proximo_numero = (ultimo_estagio[0] or 0) + 1
+
+        # Insere o novo estágio
+        cursor.execute(
+            "INSERT INTO estagios (cultura_id, numero_estagio, nome, duracao, kc) VALUES (%s, %s, %s, %s, %s)",
+            (cultura_id, proximo_numero, estagio, duracao, kc)
+        )
+        
+        cursor.close()
+        conexão.close()
+    
+    
+    
 #db.executar("""INSERT INTO usuarios (email, senha_hash) VALUES ('flaviomaurilio0@gmail.com', '12345')""")
 #db.executar("""INSERT INTO solos (nome, capacidade_campo, ponto_murcha, densidade, porosidade, cond_hidraulica) VALUES ('Arenoso-argiloso', 150, 175, 1.65, 0.35, 'Alta')""")
 #db.executar("""INSERT INTO culturas (nome, estagio, numero_estagio, tempo, kc) VALUES ('Coentro', 'final', 3, 10, 0.5)""")
