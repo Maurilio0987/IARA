@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from functools import wraps
 import os
-from banco_de_dados import DatabaseManager, sha256
+from banco_de_dados_pg import DatabaseManager, sha256
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import math
@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = 'chave_secreta'  
 
 
-db_url = "mysql://root:ajNlmcyIPZQVSGsTkLXFRDjmpkNzkQTw@hopper.proxy.rlwy.net:22040/railway"
+db_url = "postgresql://iara_database_e7zl_user:2FW7U5MdZnj0b88ufN2HBrB6kcWuJQYg@dpg-d0ku70vfte5s73917eng-a.oregon-postgres.render.com/iara_database_e7zl"
 db = DatabaseManager(db_url)
 
 BASE_URL = "http://10.180.0.100:8123/api/states"
@@ -159,11 +159,11 @@ def atualizar_volumes():
 
 
 
-#scheduler = BackgroundScheduler(timezone=timezone("America/Sao_Paulo"))
-#scheduler.add_job(atualizar_volumes, "cron", minute=0, id="volume_por_hora")
-#scheduler.add_job(db.zerar_volumes, "cron", hour=0, minute=0, second=0, id="zerar_volumes_diario")
-#scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0, id="atualizar_hortas_diario")
-#scheduler.start()
+scheduler = BackgroundScheduler(timezone=timezone("America/Sao_Paulo"))
+scheduler.add_job(atualizar_volumes, "cron", minute=0, id="volume_por_hora")
+scheduler.add_job(db.zerar_volumes, "cron", hour=0, minute=0, second=0, id="zerar_volumes_diario")
+scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0, id="atualizar_hortas_diario")
+scheduler.start()
 
 
 

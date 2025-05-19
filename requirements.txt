@@ -4,3 +4,4 @@ pymysql
 apscheduler
 requests
 pytz
+pg8000
