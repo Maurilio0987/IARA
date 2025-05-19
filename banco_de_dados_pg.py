@@ -84,7 +84,7 @@ class DatabaseManager:
             database=parsed_url.path.lstrip('/'),
             ssl_context=True  # Render exige SSL
         )
-        conexao.autocommit = True  # Ativa autocommit
+        conexão.autocommit = True  # Ativa autocommit
         return conexão
 
     
