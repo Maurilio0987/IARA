@@ -322,9 +322,9 @@ class DatabaseManager:
     def zerar_volumes(self, chave):
         conexão = self.conectar_banco_de_dados()
         cursor = conexão.cursor()
-
+        
         # PostgreSQL usa jsonb_array_append para JSON, mas precisa ser refeito manualmente
-        cursor.execute("SELECT historico, volume_irrigado FROM hortas WHERE chave = %s", (chave,))
+        cursor.execute("SELECT historico, volume_irrigado FROM hortas WHERE chave = %s", (chave))
         resultado = cursor.fetchone()
 
         if resultado:
@@ -357,7 +357,7 @@ class DatabaseManager:
             INSERT INTO hortas (usuario_id, nome, tamanho, duracao, solo_id, estagio_id, historico)
             VALUES (%s, %s, %s, %s, %s, %s, %s);
             """
-            historico_inicial = [0, 0, 0, 0, 0, 0]
+            historico_inicial = "[0,0,0,0,0,0]"
             conexão = self.conectar_banco_de_dados()
             cursor = conexão.cursor()
             cursor.execute(query, (usuario, nome, tamanho, tempo, solo, estagio_id, historico_inicial))

@@ -151,6 +151,10 @@ def atualizar_volumes():
         if consumo["consumo"] == "---": consumo["consumo"] = 0
         db.adicionar_volume(chave, consumo["consumo"])
 
+def zerar_volumes():
+    chaves = db.chaves()
+    for chave in chaves:            
+        db.zerar_volumes(chave)
 
 
 
@@ -158,12 +162,11 @@ def atualizar_volumes():
 
 
 
-
-#scheduler = BackgroundScheduler(timezone=timezone("America/Sao_Paulo"))
-#scheduler.add_job(atualizar_volumes, "cron", minute=0, id="volume_por_hora")
-#scheduler.add_job(db.zerar_volumes, "cron", hour=0, minute=0, second=0, id="zerar_volumes_diario")
-#scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0, id="atualizar_hortas_diario")
-#scheduler.start()
+scheduler = BackgroundScheduler(timezone=timezone("America/Sao_Paulo"))
+scheduler.add_job(atualizar_volumes, "cron", minute=0, id="volume_por_hora")
+scheduler.add_job(zerar_volumes, "cron", hour=0, minute=0, second=0, id="zerar_volumes_diario")
+scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0, id="atualizar_hortas_diario")
+scheduler.start()
 
 
 
@@ -434,7 +437,7 @@ def adicionar_solo():
 
 
 
-#app.run(debug=True, host="localhost", port=80)
+#app.run(debug=True, host="192.168.3.11", port=80)
 
 
 if __name__ == "__main__":
