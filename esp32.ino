@@ -4,11 +4,11 @@
 // ----- CONFIGURAÇÕES -----
 const char* ssid = "ECOLOGIC";
 const char* password = "JUAN1234";
-const char* chave = "6027b14b-2879-11f0-92cc-a2aaabbee758";  // Substitua pela chave da horta
+const char* chave = "e0ac385f-1a3a-4f99-b19f-46acb5a17b37";  // Substitua pela chave da horta
 const char* servidor = "https://iara-k3zh.onrender.com/"; // sem a chave no final
 
 
-const unsigned long intervalo = 15UL * 60UL * 1000UL; // 15 minutos em ms
+const unsigned long intervalo = 10UL * 60UL * 1000UL; // 15 minutos em ms
 
 // Pinos
 const int PINO_VALVULA = 5; // Rele ligado à válvula solenoide
