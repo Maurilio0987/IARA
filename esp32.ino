@@ -2,9 +2,9 @@
 #include <HTTPClient.h>
 
 // ----- CONFIGURAÇÕES -----
-const char* ssid = "ECOLOGIC";
-const char* password = "JUAN1234";
-const char* chave = "e0ac385f-1a3a-4f99-b19f-46acb5a17b37";  // Substitua pela chave da horta
+const char* ssid = "IARA";
+const char* password = "IARACYMA";
+const char* chave = "da6d7f71-6c18-4530-9f02-064d346db9a5";  // Substitua pela chave da horta
 const char* servidor = "https://iara-k3zh.onrender.com/"; // sem a chave no final
 
 
@@ -43,7 +43,7 @@ void liberarAgua(float volumeDesejadoL) {
   digitalWrite(PINO_VALVULA, HIGH); // Liga a válvula
   Serial.println("Válvula ativada");
 
-  while (litrosEntregues < volumeDesejadoL && millis() - tempoInicio < 60000) {
+  while (litrosEntregues < volumeDesejadoL ) {//&& millis() - tempoInicio < 60000) {
     delay(1000); // a cada segundo
     litrosEntregues = (pulsos / (fatorCalibracao * 60.0)); // L/min
     Serial.print("Volume atual: ");
@@ -104,16 +104,18 @@ void requisitarVolume() {
       Serial.print("Resposta: ");
       Serial.println(payload);
 
-      int volStart = payload.indexOf("\"volume\":") + 9;
+      int volStart = payload.indexOf("\"volume\":") + 9; // pula o texto '"volume":'
       int volEnd = payload.indexOf(",", volStart);
       float volume = payload.substring(volStart, volEnd).toFloat();
 
-      int irriStart = payload.indexOf("\"volume_irrigado\":") + 19;
+      int irriStart = payload.indexOf("\"volume_irrigado\":") + 18; // pula o texto '"volume_irrigado":'
       int irriEnd = payload.indexOf("}", irriStart);
       float volumeIrrigado = payload.substring(irriStart, irriEnd).toFloat();
 
       float volumeRestante = volume - volumeIrrigado;
-
+      Serial.println(volume);
+      Serial.println(volumeIrrigado);
+      Serial.println(volumeRestante);
       Serial.print("Volume restante a irrigar: ");
       Serial.print(volumeRestante, 3);
       Serial.println(" L");
