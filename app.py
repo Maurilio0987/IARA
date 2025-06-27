@@ -168,6 +168,15 @@ scheduler.add_job(db.atualizar_hortas, "cron", hour=0, minute=0, second=0, id="a
 scheduler.start()
 
 
+@app.route("/a")
+def a():
+    atualizar_volumes()
+    return "a"
+
+@app.route("/b")
+def b():
+    db.atualizar_hortas()
+    return "b"
 
 #                  #
 #-----ESTÁTICO-----#
