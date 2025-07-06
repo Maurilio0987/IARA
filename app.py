@@ -33,7 +33,7 @@ sensor_ids = {
 }
 
 
-
+dados = {}
 
 #                 #
 #-----FUNÇÕES-----#
@@ -314,18 +314,24 @@ def remover(chave):
 
 
 
-@app.route("/hortas/<chave>")
+@app.route("/hortas/<chave>", methods=["GET", "POST"])
 @login_required
 def horta(chave):
-    horta = db.horta(chave)
-    return render_template("horta.html", horta={
-        "nome": horta[1],
-        "planta": horta[3],
-        "solo": horta[4],
-        "estagio": horta[6],
-        "tempo": horta[7],
-        "area": horta[2]})
-
+    if request.methods == "GET":
+        horta = db.horta(chave)
+        return render_template("horta.html", horta={
+            "nome": horta[1],
+            "planta": horta[3],
+            "solo": horta[4],
+            "estagio": horta[6],
+            "tempo": horta[7],
+            "area": horta[2]})
+    elif request.methods == "POST":
+        dados = request.json
+        temperatura = dados.get("temperatura")
+        umidade_solo = dados.get("umidade_solo")
+        umidade_ar = dados.get("umidade_ar")
+        dados # continuar daqui !!!!
 
 @app.route("/consumo/<chave>")
 def consumo(chave):
@@ -343,6 +349,12 @@ def estacao():
     return jsonify(dados_meteorologicos())
 
 
+@app.route("/dados/<chave>", methods=["POST"])
+def dados(chave):
+    if dados[chave]: return dados[chave]
+    else: return jsonify({"temperatura": "Sem dados",
+                          "umidade_solo": "Sem dados", 
+                          "umidade_ar": "Sem dados"})
 
 
 #               #
