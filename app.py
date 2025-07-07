@@ -317,7 +317,7 @@ def remover(chave):
 @app.route("/hortas/<chave>", methods=["GET", "POST"])
 @login_required
 def horta(chave):
-    if request.methods == "GET":
+    if request.method == "GET":
         horta = db.horta(chave)
         return render_template("horta.html", horta={
             "nome": horta[1],
@@ -326,7 +326,7 @@ def horta(chave):
             "estagio": horta[6],
             "tempo": horta[7],
             "area": horta[2]}, chave=chave)
-    elif request.methods == "POST":
+    elif request.method == "POST":
         sensores = request.json
         temperatura = dados.get("temperatura")
         umidade_solo = dados.get("umidade_solo")
