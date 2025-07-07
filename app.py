@@ -12,7 +12,7 @@ from pytz import timezone
 app = Flask(__name__)
 app.secret_key = 'chave_secreta'  
 
-db_url = "postgresql://banco_de_dados_lib5_user:ufjGWAHHmq8ZdtVA6oq1Xvr8dTndCTM9@dpg-d1dis0ffte5s73bm4bbg-a.oregon-postgres.render.com/banco_de_dados_lib5"
+db_url = "postgresql://banco_de_dados_08i4_user:ac6u2uqkRDgkyBH9RUw3tbkiA3XXvb0h@dpg-d1lrl795pdvs73cbph0g-a.oregon-postgres.render.com/banco_de_dados_08i4"
 db = DatabaseManager(db_url)
 
 BASE_URL = "http://10.180.0.100:8123/api/states"
