@@ -192,7 +192,7 @@
             
             <div class="bg-white rounded-lg card p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold text-emerald-800">Dados Meteorológicos</h3>
+                    <h3 class="text-xl font-semibold text-emerald-800">Sensores</h3>
                     <i class="fas fa-cloud-sun text-blue-500 text-xl"></i>
                 </div>
                 <div class="space-y-3 text-gray-700">
@@ -202,21 +202,14 @@
                     </div>
                     <div class="flex justify-between">
                         <span>Umidade do ar:</span>
-                        <span class="data-value"><span id="umidade">---</span> %</span>
+                        <span class="data-value"><span id="umidade_ar">---</span> %</span>
                     </div>
                     <div class="flex justify-between">
-                        <span>Radiação solar:</span>
-                        <span class="data-value"><span id="radiacao">---</span> W/m²</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Velocidade do vento:</span>
-                        <span class="data-value"><span id="vento">---</span> km/h</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>ETo:</span>
-                        <span class="data-value"><span id="eto">---</span> mm/dia</span>
+                        <span>Umidade do solo:</span>
+                        <span class="data-value"><span id="umidade_solo">---</span> %</span>
                     </div>
                 </div>
+
             </div>
             
             
@@ -281,6 +274,24 @@
             sidebar.classList.toggle('active');
             overlay.classList.toggle('hidden');
         }
+        function atualizarSensores(chave) {
+            fetch(`/dados/${chave}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('temperatura').textContent = data.temperatura ?? '---';
+                document.getElementById('umidade_ar').textContent = data.umidade_ar ?? '---';
+                document.getElementById('umidade_solo').textContent = data.umidade_solo ?? '---';
+            })
+            .catch(error => {
+                console.error("Erro ao buscar dados dos sensores:", error);
+            });
+        }
+
+        // Substitua 'SUA_CHAVE' pela variável real da horta
+        setInterval(() => atualizarSensores("{{ chave }}"), 5000);
+
     </script>
 </body>
 </html>

@@ -325,7 +325,7 @@ def horta(chave):
             "solo": horta[4],
             "estagio": horta[6],
             "tempo": horta[7],
-            "area": horta[2]})
+            "area": horta[2]}, chave=chave)
     elif request.methods == "POST":
         sensores = request.json
         temperatura = dados.get("temperatura")
@@ -459,9 +459,9 @@ def adicionar_solo():
 
 
 
-#app.run(debug=True, host="localhost", port=80)
+app.run(debug=True, host="localhost", port=80)
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+#    port = int(os.environ.get("PORT", 5000))
+#    app.run(host="0.0.0.0", port=port)
