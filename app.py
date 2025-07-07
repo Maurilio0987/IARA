@@ -352,7 +352,7 @@ def estacao():
 
 
 @app.route("/dados/<chave>", methods=["GET"])
-def dados(chave):
+def dados_rota(chave):
     if dados[chave]: return dados[chave]
     else: return jsonify({"temperatura": "Sem dados",
                           "umidade_solo": "Sem dados",
