@@ -276,7 +276,7 @@
         }
         function atualizarSensores(chave) {
             fetch(`/dados/${chave}`, {
-                method: 'POST'
+                method: 'GET'
             })
             .then(response => response.json())
             .then(data => {
