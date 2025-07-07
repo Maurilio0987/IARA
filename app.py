@@ -351,11 +351,11 @@ def estacao():
     return jsonify(dados_meteorologicos())
 
 
-@app.route("/dados/<chave>", methods=["POST"])
+@app.route("/dados/<chave>", methods=["GET"])
 def dados(chave):
     if dados[chave]: return dados[chave]
     else: return jsonify({"temperatura": "Sem dados",
-                          "umidade_solo": "Sem dados", 
+                          "umidade_solo": "Sem dados",
                           "umidade_ar": "Sem dados"})
 
 
