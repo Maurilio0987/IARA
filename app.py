@@ -327,11 +327,13 @@ def horta(chave):
             "tempo": horta[7],
             "area": horta[2]})
     elif request.methods == "POST":
-        dados = request.json
+        sensores = request.json
         temperatura = dados.get("temperatura")
         umidade_solo = dados.get("umidade_solo")
         umidade_ar = dados.get("umidade_ar")
-        dados # continuar daqui !!!!
+        sensores[f"{chave}"] = {"temperatura": temperatura,
+                                "umidade_solo": umidade_solo,
+                                "umidade_ar": umidade_ar}
 
 @app.route("/consumo/<chave>")
 def consumo(chave):
@@ -457,9 +459,9 @@ def adicionar_solo():
 
 
 
-#app.run(debug=True, host="192.168.3.11", port=80)
+app.run(debug=True, host="localhost", port=80)
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+#    port = int(os.environ.get("PORT", 5000))
+#    app.run(host="0.0.0.0", port=port)
