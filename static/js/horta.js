@@ -3,31 +3,31 @@ function getChaveHorta() {
   return partes[partes.length - 1];
 }
 
-function atualizar_consumo() {
-  const chave = getChaveHorta();
-  fetch("/consumo/"+chave)
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-    return response.json(); // ou response.text() se for texto
-  })
-  .then(data => {
-     console.log(data);
-	 let elemento_eto = document.getElementById("eto");
-	 let elemento_etc = document.getElementById("etc");
-	 let elemento_volume = document.getElementById("volume");
+// function atualizar_consumo() {
+//   const chave = getChaveHorta();
+//   fetch("/consumo/"+chave)
+//   .then(response => {
+//     if (!response.ok) {
+//       throw new Error(`Erro na requisição: ${response.status}`);
+//     }
+//     return response.json(); // ou response.text() se for texto
+//   })
+//   .then(data => {
+//      console.log(data);
+// 	 let elemento_eto = document.getElementById("eto");
+// 	 let elemento_etc = document.getElementById("etc");
+// 	 let elemento_volume = document.getElementById("volume");
 
 
-	 elemento_eto.innerHTML = " " + data["eto"];
+// 	 elemento_eto.innerHTML = " " + data["eto"];
 	 //elemento_etc.innerHTML = " " + data["etc"];
 	 //elemento_volume.innerHTML = " " + data["consumo"];
-	})
+// 	})
 
-  .catch(error => {
-    console.error('Erro ao buscar os dados:', error);
-  });
-}
+//   .catch(error => {
+//     console.error('Erro ao buscar os dados:', error);
+//   });
+// }
 
 function atualizar_historico() {
   const chave = getChaveHorta();
@@ -145,7 +145,7 @@ function animateVolume(element, finalValue) {
 }
 
 		
-atualizar_consumo();
+// atualizar_consumo();
 atualizar_historico();
 atualizar_consumo24();
 
