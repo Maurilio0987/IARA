@@ -42,7 +42,7 @@ function atualizar_historico() {
   	console.log(data);
 	const diasSemana = ['Há 6 dias', 'Há 5 dias', 'Há 4 dias', 'Há 3 dias', 'Há 2 dias', 'Ontem', 'Hoje'];
 	//data[0] = JSON.parse(data[0]);
-	const consumo = [data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[1]];
+	const consumo = [20, 24, 18, 21, 19, 20, 0]//[data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][5], data[1]];
 	gerarGraficoConsumo(diasSemana, consumo);
 
 	})
