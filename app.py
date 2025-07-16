@@ -15,132 +15,17 @@ app.secret_key = 'chave_secreta'
 db_url = "postgresql://banco_de_dados_08i4_user:ac6u2uqkRDgkyBH9RUw3tbkiA3XXvb0h@dpg-d1lrl795pdvs73cbph0g-a.oregon-postgres.render.com/banco_de_dados_08i4"
 db = DatabaseManager(db_url)
 
-BASE_URL = "http://10.180.0.100:8123/api/states"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MWFiZWY2ZTIyOWU0YjY5YTliNjc0NWU1MzhiZTI2NyIsImlhdCI6MTc0NTMyNTU3MywiZXhwIjoyMDYwNjg1NTczfQ.o07Qigaa-TOlNp1HFLBSzXYpMmVX0qOXZWl-WWASjKw"
-
-
-headers = {
-    "Authorization": f"Bearer {TOKEN}",
-    "Content-Type": "application/json"
-}
-
-sensor_ids = {
-    "sensor.vento_kmh": "velocidade_vento",
-    "sensor.direzione_vento": "direcao_vento",
-    "sensor.precipitacao_mm": "precipitacao",
-    "sensor.tasmota_am2301_temperature": "temperatura",
-    "sensor.tasmota_am2301_humidity": "umidade"
-}
-
-
-dados = {}
+dados_sensores = {}
 
 #                 #
 #-----FUNÇÕES-----#
 #                 #
 
-
-def calcular_eto(temperatura_C, umidade_relativa, velocidade_vento_m_s, radiacao_solar_W_m2):
-    radiacao_solar_MJ_m2_dia = radiacao_solar_W_m2 * 0.0864
-    albedo_cultivo = 0.23
-    radiacao_liquida = (1 - albedo_cultivo) * radiacao_solar_MJ_m2_dia
-
-    pressao_vapor_saturado = 0.6108 * math.exp((17.27 * temperatura_C) / (temperatura_C + 237.3))
-    pressao_vapor_real = (umidade_relativa / 100.0) * pressao_vapor_saturado
-
-    declividade_curva_pressao_vapor = (4098 * pressao_vapor_saturado) / ((temperatura_C + 237.3) ** 2)
-    constante_psicrometrica = 0.066  # valor típico
-
-    eto = (
-        0.408 * declividade_curva_pressao_vapor * radiacao_liquida
-        + constante_psicrometrica * (900.0 / (temperatura_C + 273.0)) * velocidade_vento_m_s * (pressao_vapor_saturado - pressao_vapor_real)
-    ) / (declividade_curva_pressao_vapor + constante_psicrometrica * (1 + 0.34 * velocidade_vento_m_s))
-
-    return round(eto, 2)
-
-
-def dados_meteorologicos():
-    latitude = -5.6622
-    longitude = -37.7989
-
-    url = (
-        f"https://api.open-meteo.com/v1/forecast?"
-        f"latitude={latitude}&longitude={longitude}"
-        f"&current=temperature_2m,relative_humidity_2m,shortwave_radiation,wind_speed_10m"
-    )
-
-    res = requests.get(url)
-
-    if res.status_code == 200:
-        dados = res.json()["current"]
-        temperatura = f"{dados['temperature_2m']}"
-        umidade = f"{dados['relative_humidity_2m']}"
-        radiacao_solar = f"{dados['shortwave_radiation']}"
-        velocidade_10m = dados['wind_speed_10m']
-
-        velocidade_2m = velocidade_10m * (4.87 / math.log(67.8 * 10 - 5.42))
-        velocidade_vento_2m = f"{velocidade_2m:.2f}"
-
-        return {
-            "temperatura": float(temperatura),
-            "umidade": float(umidade),
-            "radiacao_solar": float(radiacao_solar),
-            "vento": float(velocidade_vento_2m)
-        }
-    else:
-        return {
-            "temperatura": "---",
-            "umidade": "---",
-            "radiacao_solar": "---",
-            "vento": "---"}
-
-"""
-    response = requests.get(BASE_URL, headers=headers)
-    response.raise_for_status()
-
-    dados_home = response.json()
-    resultado = {}
-
-    for sensor in dados_home:
-        eid = sensor.get("entity_id")
-        if eid in sensor_ids:
-            resultado[sensor_ids[eid]] = sensor.get("state")
-
-    resposta = {
-        "precipitacao": resultado["precipitacao"],
-        "vento": float(resultado["velocidade_vento"]) * 3.6,
-        "direcao": resultado["direcao_vento"],
-        "temperatura": resultado["temperatura"],
-        "umidade": resultado["umidade"]
-    }
-
-    temperatura = resposta["temperatura"]
-    velocidade_vento = resposta["vento"]
-"""
-
 def calcular_consumo(chave):    
     horta = db.horta(chave)
     kc = horta[8]
     area = horta[2]
-
-
-    dados = dados_meteorologicos()
-    if dados["temperatura"] == "---": return {"eto": "---",
-                                             "etc": "---",
-                                             "consumo": "---"} 
-    temperatura = dados["temperatura"]
-    umidade = dados["umidade"]
-    rad_solar = dados["radiacao_solar"]
-    velocidade_vento = dados["vento"]
-    
-    
-    eto = calcular_eto(temperatura, umidade, velocidade_vento, rad_solar)
-    etc = eto * kc
-    consumo = etc * area
-    
-    return {"eto": eto,
-            "etc": etc,
-            "consumo": round(consumo/24, 2)}
+    pass
 
 
 def atualizar_volumes():
@@ -264,10 +149,6 @@ def cadastrar():
 
 
 
-
-
-
-
 #                #   
 #-----HORTAS-----#
 #                #
@@ -328,12 +209,13 @@ def horta(chave):
             "area": horta[2]}, chave=chave)
     elif request.method == "POST":
         sensores = request.json
-        temperatura = dados.get("temperatura")
-        umidade_solo = dados.get("umidade_solo")
-        umidade_ar = dados.get("umidade_ar")
-        sensores[f"{chave}"] = {"temperatura": temperatura,
-                                "umidade_solo": umidade_solo,
-                                "umidade_ar": umidade_ar}
+        temperatura = sensores.get("temperatura")
+        umidade_solo = sensores.get("umidade_solo")
+        umidade_ar = sensores.get("umidade_ar")
+        dados_sensores[chave] = {"temperatura": temperatura,
+                                 "umidade_solo": umidade_solo,
+                                 "umidade_ar": umidade_ar}
+        return {"status": "success"}, 200
 
 @app.route("/consumo/<chave>")
 def consumo(chave):
@@ -345,18 +227,13 @@ def historico(chave):
     return jsonify(db.historico(chave))
 
 
-
-@app.route("/estacao")
-def estacao():
-    return jsonify(dados_meteorologicos())
-
-
 @app.route("/dados/<chave>", methods=["GET"])
 def dados_rota(chave):
-    if dados[chave]: return dados[chave]
-    else: return jsonify({"temperatura": "Sem dados",
-                          "umidade_solo": "Sem dados",
-                          "umidade_ar": "Sem dados"})
+    dado = dados_sensores.get(chave)
+    if dado: return dados_sensores[chave]
+    else: return jsonify({"temperatura": "---",
+                          "umidade_solo": "---",
+                          "umidade_ar": "---"})
 
 
 #               #
@@ -459,7 +336,7 @@ def adicionar_solo():
 
 
 
-#app.run(debug=True, host="localhost", port=80)
+#app.run(debug=True, host="localhost", port=8000)
 
 
 if __name__ == "__main__":

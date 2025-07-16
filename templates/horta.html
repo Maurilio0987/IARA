@@ -293,23 +293,6 @@
         setInterval(() => atualizarSensores("{{ chave }}"), 5000);
 	
     </script>
-	<script>
-	function atualizarValoresAleatorios() {
-	    const temperatura = (Math.random() * 15 + 20).toFixed(1); // 20°C a 35°C
-	    const umidadeAr = Math.floor(Math.random() * 51 + 40);    // 40% a 90%
-	    const umidadeSolo = Math.floor(Math.random() * 61 + 20);  // 20% a 80%
-	
-	    document.getElementById('temperatura').textContent = temperatura;
-	    document.getElementById('umidade_ar').textContent = umidadeAr;
-	    document.getElementById('umidade_solo').textContent = umidadeSolo;
-	}
-	
-	// Atualizar a cada 2 segundos
-	setInterval(atualizarValoresAleatorios, 2000);
-	
-	// Atualizar uma vez logo que a página carregar
-	atualizarValoresAleatorios();
-	</script>
 
 </body>
 </html>
