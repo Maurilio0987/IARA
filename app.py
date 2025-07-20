@@ -33,17 +33,14 @@ def calcular_consumo(chave):
     # calculo
     return 3
 
-@app.route("/atualizar_consumo_pendente")
-def atualizar_consumo_pendente():
-    chaves = db.chaves()
-    for chave in chaves:
-        db.adicionar_pendente(chave, calcular_consumo(chave))
-    return {"status": "success"}, 200
-
-
 @app.route("/atualizar_hortas_diario")
 def atualizar_hortas_rota():
     db.atualizar_hortas()
+
+    chaves = db.chaves()
+    for chave in chaves:
+        db.adicionar_pendente(chave, calcular_consumo(chave))
+    
     return {"status": "success"}, 200
 
 
