@@ -1,7 +1,5 @@
 Flask
 gunicorn
-pymysql
-apscheduler
 requests
 pytz
-pg8000
+supabase
