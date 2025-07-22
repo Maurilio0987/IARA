@@ -190,27 +190,34 @@ def remover(chave):
 
 
 
-@app.route("/hortas/<chave>", methods=["GET", "POST"])
+@app.route("/hortas/<chave>", methods=["GET"])
 @login_required
 def horta(chave):
-    if request.method == "GET":
-        horta = db.horta(chave)
-        return render_template("horta.html", horta={
-            "nome": horta[1],
-            "planta": horta[3],
-            "solo": horta[4],
-            "estagio": horta[6],
-            "tempo": horta[7],
-            "area": horta[2]}, chave=chave)
-    elif request.method == "POST":
-        sensores = request.json
-        temperatura = sensores.get("temperatura")
-        umidade_solo = sensores.get("umidade_solo")
-        umidade_ar = sensores.get("umidade_ar")
-        dados_sensores[chave] = {"temperatura": temperatura,
-                                 "umidade_solo": umidade_solo,
-                                 "umidade_ar": umidade_ar}
-        return {"status": "success"}, 200
+    horta = db.horta(chave)
+    return render_template("horta.html", horta={
+        "nome": horta[1],
+        "planta": horta[3],
+        "solo": horta[4],
+        "estagio": horta[6],
+        "tempo": horta[7],
+        "area": horta[2]}, chave=chave)
+
+
+@app.route("/hortas/<chave>/dados", methods=["POST"])
+def receber_dados(chave):
+    sensores = request.json
+    temperatura = sensores.get("temperatura")
+    umidade_solo = sensores.get("umidade_solo")
+    umidade_ar = sensores.get("umidade_ar")
+
+    dados_sensores[chave] = {
+        "temperatura": temperatura,
+        "umidade_solo": umidade_solo,
+        "umidade_ar": umidade_ar
+    }
+
+    return {"status": "success"}, 200
+
 
 
 
