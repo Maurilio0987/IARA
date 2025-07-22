@@ -271,8 +271,7 @@ def dados_rota(chave):
 def consumo(chave):
     consumo = db.consumo(chave)
     if consumo:
-        return jsonify({'pendente': consumo[0],
-                        'irrigado': consumo[1],
+        return jsonify({'pendente': consumo[0] - consumo[1],
                         "erro": "sem erro"}), 200
     return jsonify({'erro': 'Horta não encontrada'}), 404
 
