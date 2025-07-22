@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IARA - Cadastro</title>
-    <link rel="icon" href="/static/imgs/icone.png" type="image/png">
-    <link rel="icon" href="/static/imgs/icone.ico" type="image/x-icon">
+    <title>IARA - Administrador</title>
+    <link rel="icon" href="./static/imgs/icone.png" type="image/png">
+    <link rel="icon" href="./static/imgs/icone.ico" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -53,18 +53,8 @@
         }
         
         .card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .input-field {
-            transition: all 0.3s ease;
-            border: 1px solid #d1d5db;
-        }
-        
-        .input-field:focus {
-            border-color: #059669;
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
         }
         
         .btn-primary {
@@ -85,20 +75,7 @@
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
-
-        .flash-messages {
-            list-style: none;
-            padding: 0;
-            margin: 20px auto;
-            width: fit-content;
-            color: red;
-            font-weight: bold;
-            text-align: center;
-        }
-
-  .flash-messages li {
-    margin-bottom: 10px;
-  }
+        
         .fixed-nav {
             position: fixed;
             top: 0;
@@ -126,6 +103,14 @@
         .overlay {
             transition: opacity 0.3s ease;
         }
+        
+        .dashboard-card {
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: scale(1.03);
+        }
 		
 		.gradient-bg {
             background: linear-gradient(135deg, #065f46 0%, #059669 100%);
@@ -133,6 +118,7 @@
     </style>
 </head>
 <body class="bg-gray-50">
+
     <nav class="gradient-bg shadow-md animate-fade-in fixed-nav">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -144,12 +130,11 @@
                     </div>
                 </div>
                 
-                
                 <div class="hidden sm:block">
                     <div class="flex space-x-8">
-                        <a href="sobre" class="text-white font-medium navbar-link">Sobre</a>
-                        <a href="contato" class="text-white font-medium navbar-link">Contato</a>
-                        <a href="ajuda" class="text-white font-medium navbar-link">Ajuda</a>
+                        <a href="/sobre" class="text-white font-medium navbar-link">Sobre</a>
+                        <a href="/contato" class="text-white font-medium navbar-link">Contato</a>
+                        <a href="/ajuda" class="text-white font-medium navbar-link">Ajuda</a>
                     </div>
                 </div>
                 
@@ -164,61 +149,63 @@
     
     <div class="sidebar" id="sidebar">
         <ul class="space-y-4 p-4">
-            <li><a href="sobre" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Sobre</a></li>
-            <li><a href="contato" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Contato</a></li>
-            <li><a href="ajuda" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Ajuda</a></li>
-        </ul>
+            <li><a href="/sobre" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Sobre</a></li>
+            <li><a href="/contato" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Contato</a></li>
+            <li><a href="/ajuda" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Ajuda</a></li>
+		</ul>
     </div>
     
     <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" onclick="toggleSidebar()"></div>
     
     <div class="main-content">
-        <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 animate-fade-in" style="animation-delay: 0.2s;">
-            <div class="bg-white rounded-lg card p-8">
-                <div class="text-center mb-8">
-                    <i class="fas fa-user-plus text-5xl text-emerald-600 mb-4"></i>
-                    <h1 class="text-2xl font-bold text-emerald-800">Criar nova conta</h1>
-                    <p class="text-gray-600 mt-2">Preencha os campos abaixo para se cadastrar</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="text-center mb-12">
+                <h1 class="text-3xl font-bold text-emerald-800">Painel Administrativo</h1>
+                <p class="text-gray-600 mt-2">Gerencie as configurações do sistema</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <div class="bg-white rounded-lg card p-6 dashboard-card">
+                    <div class="text-center">
+                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100 text-emerald-600 mb-4">
+                            <i class="fas fa-seedling text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-emerald-800 mb-2">Culturas</h3>
+                        <p class="text-gray-600 mb-4">Gerencie as culturas agrícolas do sistema</p>
+                        <a href="/admin/culturas" class="inline-block w-full btn-primary text-white px-4 py-2 rounded-md shadow-md">
+                            <i class="fas fa-eye mr-2"></i> Ver Culturas
+                        </a>
+                    </div>
                 </div>
                 
-                <form action="cadastrar" method="POST" class="space-y-6">
-                    {% with messages = get_flashed_messages() %}
-                      {% if messages %}
-                        <ul class="flash-messages">
-                          {% for message in messages %}
-                            <li>{{ message }}</li>
-                          {% endfor %}
-                        </ul>
-                      {% endif %}
-                    {% endwith %}
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-envelope text-gray-400"></i>
-                            </div>
-                            <input type="email" id="email" name="email" class="w-full pl-10 pr-4 py-2 rounded-md input-field focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Digite seu email" required>
+                
+                <div class="bg-white rounded-lg card p-6 dashboard-card">
+                    <div class="text-center">
+                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100 text-emerald-600 mb-4">
+                            <i class="fas fa-mountain text-2xl"></i>
                         </div>
+                        <h3 class="text-xl font-semibold text-emerald-800 mb-2">Solos</h3>
+                        <p class="text-gray-600 mb-4">Gerencie os tipos de solo do sistema</p>
+                        <a href="/admin/solos" class="inline-block w-full btn-primary text-white px-4 py-2 rounded-md shadow-md">
+                            <i class="fas fa-eye mr-2"></i> Ver Solos
+                        </a>
                     </div>
-                    
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-lock text-gray-400"></i>
-                            </div>
-                            <input type="password" id="password" name="password" class="w-full pl-10 pr-4 py-2 rounded-md input-field focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Digite sua senha" required>
+                </div>
+                
+                
+                <div class="bg-white rounded-lg card p-6 dashboard-card">
+                    <div class="text-center">
+                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 text-red-600 mb-4">
+                            <i class="fas fa-sign-out-alt text-2xl"></i>
                         </div>
+                        <h3 class="text-xl font-semibold text-red-800 mb-2">Sair</h3>
+                        <p class="text-gray-600 mb-4">Encerrar sua sessão administrativa</p>
+                        <a href="/logout" class="inline-block w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md transition duration-300">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Sair do Sistema
+                        </a>
                     </div>
-                    
-                    <button type="submit" class="w-full btn-primary text-white px-6 py-3 rounded-md shadow-md flex items-center justify-center">
-                        <i class="fas fa-user-plus mr-2"></i> Criar conta
-                    </button>
-                    
-                    <div class="text-center text-sm text-gray-600">
-                        Já tem uma conta? <a href="/" class="text-emerald-600 hover:text-emerald-800 font-medium">Faça login</a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -238,7 +225,6 @@
     </footer>
     
     <script>
-        
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
@@ -246,7 +232,6 @@
             sidebar.classList.toggle('active');
             overlay.classList.toggle('hidden');
         }
-        
         
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
