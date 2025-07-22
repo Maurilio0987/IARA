@@ -289,6 +289,10 @@ class DatabaseManager:
                 self.supabase.table("estagios").update({"numero_estagio": i}).eq("id", est["id"]).execute()
 
 
+    def remover_cultura(self, id):
+        resposta = self.supabase.table("solos").delete().eq("id", id).execute()
+
+
     def historico_dias(self, horta_id, dias):
         """
         Retorna os últimos 'dias' de registros da tabela historico para a horta específica.

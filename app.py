@@ -53,17 +53,6 @@ def calcular_consumo_pendente_rota():
     return {"status": "success"}, 200
 
 
-
-@app.route("/a")
-def a():
-    atualizar_consumos_pendente()
-    return "a"
-
-@app.route("/b")
-def b():
-    db.atualizar_hortas()
-    return "b"
-
 #                  #
 #-----ESTÁTICO-----#
 #                  #
@@ -336,6 +325,11 @@ def adicionar_cultura():
 def remover_cultura(id):
     db.remover_cultura(id)
     return redirect(url_for("culturas"))
+
+@app.route("/admin/remover_solo/<id>")
+def remover_solo(id):
+    db.remover_solo(id)
+    return redirect(url_for("solos"))
     
 
 @app.route("/admin/solos")

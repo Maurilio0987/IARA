@@ -154,6 +154,7 @@
                             <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Densidade</th>
                             <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Porosidade</th>
                             <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Cond. Hidráulica</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-emerald-800 uppercase tracking-wider">Excluir</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -166,6 +167,12 @@
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ solo[4] }}</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ solo[5] }}</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ solo[6] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"><button style="background-color: red;
+                                    color: white;
+                                    cursor: pointer;
+                                    border: none;
+                                    padding: 6px 12px;
+                                    border-radius: 4px;" onclick="window.location.href='remover_solo/{{ solo[1] }}'">X</button></td>
 							</tr>
 						{% endfor %}
                     </tbody>
