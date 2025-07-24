@@ -135,7 +135,6 @@ class DatabaseManager:
     def adicionar_horta(self, usuario_id, nome, tamanho, cultura_id, solo_id, tempo):
         estagio_id = self.estagio(cultura_id, tempo)
         if estagio_id is not None:
-            historico_inicial = [0, 0, 0, 0, 0, 0]
 
             data = {
                 "usuario_id": usuario_id,
@@ -143,8 +142,7 @@ class DatabaseManager:
                 "tamanho": tamanho,
                 "duracao": tempo,
                 "solo_id": solo_id,
-                "estagio_id": estagio_id,
-                "historico": historico_inicial
+                "estagio_id": estagio_id
             }
 
             resp = self.supabase.table("hortas").insert(data).execute()
