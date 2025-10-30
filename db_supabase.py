@@ -436,7 +436,7 @@ class DatabaseManager:
         
         consumo = resp_consumo.data[0]["consumo"] if resp_consumo.data else 0
 
-        return [pendente, consumo]
+        return [float(pendente), float(consumo)]
 
 
     def zerar_volumes(self, chave):
@@ -501,3 +501,4 @@ class DatabaseManager:
 if __name__ == "__main__":
     db = DatabaseManager(url, key)
     print(db.usuario("abc@gmail.com"))
+
