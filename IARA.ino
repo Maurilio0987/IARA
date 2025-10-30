@@ -144,7 +144,7 @@ void enviarDados(float temperatura, float umidade_ar, int umidade_solo) {
 }
 
 void enviarVolumeIrrigado(float litros) {
-  if (WiFi.status() != WL_CONNECTED) return; 
+  if (WiFi.status() != WL_CONNECTED) return;
 
   HTTPClient http;
   String url = String(servidor) + "/irrigado/" + chave_horta;

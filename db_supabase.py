@@ -194,27 +194,95 @@ class DatabaseManager:
         }).execute()
 
 
-    def adicionar_pendente(self, chave, litros):
-        # Busca o valor atual da coluna pendente
+    def adicionar_pendente_dia(self, chave, litros):
         resp = self.supabase.table("hortas") \
-            .select("id, pendente") \
+            .select("id, pendente_dia") \
             .eq("chave", chave) \
             .limit(1) \
             .execute()
 
         if resp.data:
             registro = resp.data[0]
-            pendente_atual = registro.get("pendente", 0) or 0  # evita erro se pendente for None
+            pendente_atual = registro.get("pendente_dia", 0) or 0  # evita erro se pendente for None
             novo_pendente = pendente_atual + litros
 
             # Atualiza o valor de pendente
             self.supabase.table("hortas") \
-                .update({"pendente": novo_pendente}) \
+                .update({"pendente_dia": novo_pendente}) \
                 .eq("id", registro["id"]) \
                 .execute()
         else:
             print(f"[ERRO] Nenhuma horta encontrada com chave '{chave}'")
 
+    def adicionar_pendente_hora(self, chave, litros):
+        resp = self.supabase.table("hortas") \
+            .select("id, pendente_hora") \
+            .eq("chave", chave) \
+            .limit(1) \
+            .execute()
+
+        if resp.data:
+            registro = resp.data[0]
+            pendente_atual = registro.get("pendente_hora", 0) or 0  # evita erro se pendente for None
+            novo_pendente = pendente_atual + litros
+
+            # Atualiza o valor de pendente
+            self.supabase.table("hortas") \
+                .update({"pendente_hora": novo_pendente}) \
+                .eq("id", registro["id"]) \
+                .execute()
+        else:
+            print(f"[ERRO] Nenhuma horta encontrada com chave '{chave}'")
+
+    def pendente_dia(self, chave):
+        try:
+            # Busca apenas a coluna "pendente"
+            resp = self.supabase.table("hortas") \
+                .select("pendente_dia") \
+                .eq("chave", chave) \
+                .limit(1) \
+                .execute()
+
+            if resp.data:
+                registro = resp.data[0]
+                
+                # Pega o valor, garantindo que 0.0 seja o padrão se for None ou não existir
+                pendente_atual = registro.get("pendente_dia", 0.0) or 0.0
+                
+                return float(pendente_atual) # Garante que o retorno seja um float
+            else:
+                # Imprime o mesmo erro da sua outra função
+                print(f"[ERRO] Nenhuma horta encontrada com chave '{chave}'")
+                return 0.0
+
+        except Exception as e:
+            print(f"[ERRO] Falha ao consultar Supabase: {e}")
+            return 0.0
+
+    def pendente_hora(self, chave):
+        try:
+            # Busca apenas a coluna "pendente"
+            resp = self.supabase.table("hortas") \
+                .select("pendente_hora") \
+                .eq("chave", chave) \
+                .limit(1) \
+                .execute()
+
+            if resp.data:
+                registro = resp.data[0]
+                
+                # Pega o valor, garantindo que 0.0 seja o padrão se for None ou não existir
+                pendente_atual = registro.get("pendente_hora", 0.0) or 0.0
+                
+                return float(pendente_atual) # Garante que o retorno seja um float
+            else:
+                # Imprime o mesmo erro da sua outra função
+                print(f"[ERRO] Nenhuma horta encontrada com chave '{chave}'")
+                return 0.0
+
+        except Exception as e:
+            print(f"[ERRO] Falha ao consultar Supabase: {e}")
+            return 0.0
 
     def adicionar_consumo(self, chave, litros):
         hoje = date.today().isoformat()
@@ -355,12 +423,12 @@ class DatabaseManager:
 
     def consumo(self, chave):
         # Primeiro: buscar o valor de "pendente" da tabela "hortas"
-        resp_horta = self.supabase.table("hortas").select("chave, pendente").eq("chave", chave).limit(1).execute()
+        resp_horta = self.supabase.table("hortas").select("chave, pendente_dia").eq("chave", chave).limit(1).execute()
         if not resp_horta.data:
             return (None, None)
 
         horta_chave = resp_horta.data[0]["chave"]
-        pendente = resp_horta.data[0]["pendente"]
+        pendente = resp_horta.data[0]["pendente_dia"]
 
         # Segundo: buscar o valor de "consumo" do dia atual da tabela "historico"
         hoje = str(date.today())  # formato: 'YYYY-MM-DD'
@@ -370,10 +438,11 @@ class DatabaseManager:
 
         return [pendente, consumo]
 
+
     def zerar_volumes(self, chave):
         # Atualiza o campo 'pendente' para 0 na tabela 'hortas' para a horta com a chave fornecida
         self.supabase.table("hortas") \
-            .update({"pendente": 0}) \
+            .update({"pendente_dia": 0, "pendente_hora": 0}) \
             .eq("chave", chave) \
             .execute()
 

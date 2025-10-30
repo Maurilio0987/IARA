@@ -6,7 +6,7 @@ from db_supabase import DatabaseManager, sha256
 import requests
 import math
 from pytz import timezone
-
+import datetime
 
 
 app = Flask(__name__)
@@ -21,17 +21,69 @@ db = DatabaseManager(url, key)
 
 dados_sensores = {}
 
+DISTRIBUICAO_HORARIA_ETO = {
+    0: 0.0,
+    1: 0.0,
+    2: 0.0,
+    3: 0.0,
+    4: 0.0,
+    5: 0.0,
+    6: 0.0,
+    7: 0.01,
+    8: 0.03,
+    9: 0.05,
+    10: 0.09,
+    11: 0.13,
+    12: 0.16,
+    13: 0.16,
+    14: 0.15,
+    15: 0.11,
+    16: 0.07,
+    17: 0.04,
+    18: 0.0,
+    19: 0.0,
+    20: 0.0,
+    21: 0.0,
+    22: 0.0,
+    23: 0.0
+}
+
 #                 #
 #-----FUNÇÕES-----#
 #                 #
 
-def calcular_consumo(chave):    
+def calcular_consumo_diario(chave):
     horta = db.horta(chave)
     kc = horta[8]
     area = horta[2]
-    sensores = dados_sensores.get(chave)
-    # calculo
-    return 3
+
+    sensores = dados_sensores.get(chave) # sensores de temperatura, umidade do solo e umidade do ar no dicionario
+    try:
+        if float(sensores["umidade_solo"]) > 70:
+            return 0
+    except:
+        print("sem dados do sensor de umidade do solo")
+        return 0
+    
+    response = requests.get("http://api.weatherapi.com/v1/forecast.json?key=c37bbfb8d14047ef8a231243253010&q=Apodi&days=1&aqi=no&alerts=no").json()
+    tmax = response["forecast"]["forecastday"][0]["day"]["maxtemp_c"]
+    tmin = response["forecast"]["forecastday"][0]["day"]["mintemp_c"]
+
+    Ra = 35.4
+    eto = kc * (0.0023 * Ra * ((tmax+tmin)/2 + 17.8) * ((tmax - tmin)**0.5))
+    pendente = area * eto
+
+    
+    
+    return round(pendente, 2)
+
+
+def calcular_consumo_hora(chave):
+    pendente = db.pendente_dia(chave)
+    hora = datetime.datetime.now().hour
+    print(pendente, hora)
+    return pendente*DISTRIBUICAO_HORARIA_ETO[int(hora)] 
+
 
 @app.route("/atualizar_hortas_diario")
 def atualizar_hortas_rota():
@@ -43,11 +95,21 @@ def atualizar_hortas_rota():
     return {"status": "success"}, 200
 
 
-@app.route("/calcular_consumo_pendente")
-def calcular_consumo_pendente_rota():
+@app.route("/calcular_consumo_pendente_dia")
+def calcular_consumo_pendente_dia_rota():
     chaves = db.chaves()
     for chave in chaves:
-        db.adicionar_pendente(chave, calcular_consumo(chave))
+        db.adicionar_pendente_dia(chave, calcular_consumo_diario(chave))
+    
+    
+    return {"status": "success"}, 200
+
+
+@app.route("/calcular_consumo_pendente_hora")
+def calcular_consumo_pendente_hora_rota():
+    chaves = db.chaves()
+    for chave in chaves:
+        db.adicionar_pendente_hora(chave, calcular_consumo_hora(chave))
     
     
     return {"status": "success"}, 200
@@ -374,10 +436,10 @@ def adicionar_solo():
 
 
 
-#app.run(debug=True, host="localhost", port=8000)
-
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    host = os.getenv("HOST", "localhost")
+    port = os.getenv("PORT", 5678)
+    debug = os.getenv("DEBUG", True)
+
+    app.run(host=host, port=port, debug=debug)
 

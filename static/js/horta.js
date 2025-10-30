@@ -97,13 +97,13 @@ function atualizar_consumo() {
     //console.log(data);
      if (ultimoPendente != data["pendente"] || ultimoConsumo != data["irrigado"]) {
      	ultimoConsumo = data["irrigado"];
-     	ultimoPendente = data["pendente"]
+     	// ultimoPendente = data["pendente"]
      	atualizar_historico()
 	     	
 		let elemento_irrigado = document.getElementById("volume_irrigado");
-	 	let elemento_pendente = document.getElementById("volume");
+	 	// let elemento_pendente = document.getElementById("volume");
 
-	    elemento_pendente.innerHTML = data["pendente"];
+	  // elemento_pendente.innerHTML = data["pendente"];
 	 	elemento_irrigado.innerHTML = data["irrigado"];
      }
 	})
