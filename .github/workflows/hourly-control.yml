@@ -1,0 +1,15 @@
+name: 4. Controle Horário (7h-17h)
+
+on:
+  schedule:
+    # Roda no minuto 0, a cada hora, entre 10:00 e 20:00 UTC
+    # (que é 07:00 às 17:00 em Fortaleza, UTC-3)
+    - cron: "0 10-20 * * *"
+  workflow_dispatch: # Permite rodar manualmente
+
+jobs:
+  hourly_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acessar a rota de cálculo de consumo da hora
+        run: curl -sSL -X GET "https://iara-k3zh.onrender.com/atualizar_hortas_diario/calcular_consumo_pendente_hora"

@@ -1,0 +1,14 @@
+name: 1. Keep-Alive (Ping 10 min)
+
+on:
+  schedule:
+    # Roda a cada 10 minutos, todos os dias, 24/7
+    - cron: "*/10 * * * *"
+  workflow_dispatch: # Permite rodar manualmente
+
+jobs:
+  ping_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping na URL raiz para manter o site acordado
+        run: curl -sSL -X GET "https://iara-k3zh.onrender.com"

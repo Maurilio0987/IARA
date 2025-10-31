@@ -1,0 +1,14 @@
+name: 2. Atualização Diária (23:55)
+
+on:
+  schedule:
+    # Roda às 02:55 UTC (que é 23:55 em Fortaleza, UTC-3)
+    - cron: "55 2 * * *"
+  workflow_dispatch: # Permite rodar manually
+
+jobs:
+  update_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acessar a rota de atualização diária
+        run: curl -sSL -X GET "https://iara-k3zh.onrender.com/atualizar_hortas_diario"

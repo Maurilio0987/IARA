@@ -1,0 +1,14 @@
+name: 3. Planejamento Diário (6:00)
+
+on:
+  schedule:
+    # Roda às 09:00 UTC (que é 06:00 em Fortaleza, UTC-3)
+    - cron: "0 9 * * *"
+  workflow_dispatch: # Permite rodar manualmente
+
+jobs:
+  planning_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acessar a rota de cálculo de consumo do dia
+        run: curl -sSL -X GET "https://iara-k3zh.onrender.com/atualizar_hortas_diario/calcular_consumo_pendente_dia"
