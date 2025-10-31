@@ -5,12 +5,12 @@ import os
 from db_supabase import DatabaseManager, sha256
 import requests
 import math
-from pytz import timezone # Importado corretamente
+from pytz import timezone
 import datetime
 
 
 app = Flask(__name__)
-app.secret_key = 'chave_secreta' 
+app.secret_key = 'chave_secreta'  
 
 url: str = "https://dphfvmjylwafuptvlqjz.supabase.co"
 key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwaGZ2bWp5bHdhZnVwdHZscWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2OTk3MDMsImV4cCI6MjA2ODI3NTcwM30.A9GIqikHRUCjLVyFlyahOQVvWjD9Z_7gtwUELMAVxcg"  # encurtado para segurança
@@ -48,11 +48,6 @@ DISTRIBUICAO_HORARIA_ETO = {
     23: 0.0
 }
 
-# --- VARIÁVEIS GLOBAIS DE UMIDADE ---
-UMIDADE_MINIMA = 40.0 # Gatilho para alerta de "umidade baixa"
-UMIDADE_MAXIMA = 70.0 # Gatilho para alerta de "umidade alta" (e para o cálculo diário)
-
-
 #                 #
 #-----FUNÇÕES-----#
 #                 #
@@ -64,11 +59,10 @@ def calcular_consumo_diario(chave):
 
     sensores = dados_sensores.get(chave) # sensores de temperatura, umidade do solo e umidade do ar no dicionario
     try:
-        if float(sensores["umidade_solo"]) > UMIDADE_MAXIMA:
-            print(f"Cálculo diário pulado para {chave}: solo já está úmido.")
+        if float(sensores["umidade_solo"]) > 70:
             return 0
     except:
-        print("sem dados do sensor de umidade do solo para cálculo diário")
+        print("sem dados do sensor de umidade do solo")
         return 0
     
     response = requests.get("http://api.weatherapi.com/v1/forecast.json?key=c37bbfb8d14047ef8a231243253010&q=Apodi&days=1&aqi=no&alerts=no").json()
@@ -86,19 +80,16 @@ def calcular_consumo_diario(chave):
 
 def calcular_consumo_hora(chave):
     pendente = db.pendente_dia(chave)
-    
-    tz_fortaleza = timezone("America/Fortaleza")
-    hora = datetime.datetime.now(tz_fortaleza).hour 
-    
-    print(f"Calculando consumo hora para {chave}: PendenteDia={pendente}, Hora={hora}")
-    return pendente * DISTRIBUICAO_HORARIA_ETO[int(hora)] 
+    hora = datetime.datetime.now().hour
+    print(pendente, hora)
+    return pendente*DISTRIBUICAO_HORARIA_ETO[int(hora)] 
 
 
 @app.route("/atualizar_hortas_diario")
 def atualizar_hortas_rota():
     db.atualizar_hortas()
     chaves = db.chaves()
-    for chave in chaves:
+    for chave in chaves:            
         db.zerar_volumes(chave)
     
     return {"status": "success"}, 200
@@ -124,9 +115,9 @@ def calcular_consumo_pendente_hora_rota():
     return {"status": "success"}, 200
 
 
-#                 #
+#                  #
 #-----ESTÁTICO-----#
-#                 #
+#                  #
 
 
 @app.route("/sobre")
@@ -206,9 +197,16 @@ def cadastrar():
     return redirect(url_for("cadastro"))
 
 
-#               #   
+
+
+
+
+
+
+
+#                #   
 #-----HORTAS-----#
-#               #
+#                #
 
 
 @app.route("/hortas")
@@ -274,57 +272,10 @@ def receber_dados(chave):
     umidade_solo = sensores.get("umidade_solo")
     umidade_ar = sensores.get("umidade_ar")
 
-    # --- LÓGICA DE ALERTA E EMERGÊNCIA EM TEMPO REAL ---
-    
-    alerta_status = "ok" # Padrão
-    
-    try:
-        umidade_float = float(umidade_solo)
-        
-        # 1. Checagem de Umidade Baixa
-        if umidade_float < UMIDADE_MINIMA:
-            alerta_status = "baixa"
-            print(f"[ALERTA] Horta {chave} com umidade BAIXA: {umidade_float}%")
-            
-            # --- Início da Lógica de Emergência (Roda 24h) ---
-            
-            # 1. VERIFICAR SE JÁ HÁ PENDÊNCIAS (A SUA NOVA CONDIÇÃO)
-            consumo_atual = db.consumo(chave)
-            pendente_total = consumo_atual[0] or 0.0
-            irrigado_total = consumo_atual[1] or 0.0
-            litros_pendentes_reais = pendente_total - irrigado_total
-
-            # 2. Decidir se adiciona a rega de emergência
-            if litros_pendentes_reais <= 0:
-                # Não há pendências, pode adicionar a rega de emergência
-                horta_db = db.horta(chave)
-                area_m2 = float(horta_db[2])
-                litros_emergencia = area_m2 * 1.0 # 1L por m²
-                
-                db.adicionar_pendente_hora(chave, litros_emergencia)
-                print(f"[EMERGENCIA] Adicionando {litros_emergencia}L à horta {chave} (Umidade baixa, acionamento emergencial)")
-            else:
-                # Já há uma rega pendente, não faz nada
-                print(f"[INFO] Umidade baixa para {chave}, mas já possui {litros_pendentes_reais:.2f}L pendentes. Nenhuma ação de emergência.")
-            
-            # --- Fim da Lógica de Emergência ---
-
-        # 2. Checagem de Umidade Alta
-        elif umidade_float > UMIDADE_MAXIMA:
-            alerta_status = "alta"
-            print(f"[ALERTA] Horta {chave} com umidade ALTA: {umidade_float}%")
-            
-    except (ValueError, TypeError):
-        print(f"Valor de umidade inválido recebido: {umidade_solo}")
-        alerta_status = "desconhecido"
-        
-    # --- FIM DA LÓGICA DE ALERTA ---
-
     dados_sensores[chave] = {
         "temperatura": temperatura,
         "umidade_solo": umidade_solo,
-        "umidade_ar": umidade_ar,
-        "alerta_umidade": alerta_status # Adiciona o status do alerta ao dicionário
+        "umidade_ar": umidade_ar
     }
 
     return {"status": "success"}, 200
@@ -371,13 +322,10 @@ def historico():
 @app.route("/dados/<chave>", methods=["GET"])
 def dados_rota(chave):
     dado = dados_sensores.get(chave)
-    if dado: 
-        return dados_sensores[chave]
-    else: 
-        return jsonify({"temperatura": "---",
+    if dado: return dados_sensores[chave]
+    else: return jsonify({"temperatura": "---",
                           "umidade_solo": "---",
-                          "umidade_ar": "---",
-                          "alerta_umidade": "desconhecido"})
+                          "umidade_ar": "---"})
 
 
 
@@ -386,36 +334,38 @@ def consumo(chave):
     consumo = db.consumo(chave)
     if consumo:
         return jsonify({'pendente': consumo[0],
-                          "irrigado": consumo[1],
-                          "erro": "sem erro"}), 200
+                        "irrigado": consumo[1],
+                        "erro": "sem erro"}), 200
     return jsonify({'erro': 'Horta não encontrada'}), 404
 
 @app.route('/esp32/consumo/<chave>')
 def consumoesp(chave):
     consumo = db.consumo(chave)
     if consumo:
-        pendente_total = consumo[0] 
-        irrigado_total = consumo[1]
-        
-        if pendente_total is None: pendente_total = 0.0
-        if irrigado_total is None: irrigado_total = 0.0
-            
-        litros_a_enviar = pendente_total - irrigado_total
-        
-        if litros_a_enviar < 0:
-            litros_a_enviar = 0.0 
-            
-        return jsonify({'pendente': litros_a_enviar,
-                          "erro": "sem erro"}), 200
+        return jsonify({'pendente': consumo[0] - consumo[1],
+                        "erro": "sem erro"}), 200
     return jsonify({'erro': 'Horta não encontrada'}), 404
 
 @app.route('/irrigado/<chave>', methods=["POST"])
 def volume_irrigado(chave):
     dados = request.json
     irrigado = dados.get("irrigado")
-    db.adicionar_consumo(chave, irrigado) # Esta função deve somar ao 'irrigado'
+    db.adicionar_consumo(chave, irrigado)
 
     return {"status": "Sucesso"}, 200
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #             #
@@ -478,9 +428,18 @@ def adicionar_solo():
     return redirect(url_for("solos"))
 
 
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     host = os.getenv("HOST", "192.168.3.41")
     port = os.getenv("PORT", 5678)
     debug = os.getenv("DEBUG", True)
 
     app.run(host=host, port=port, debug=debug)
+

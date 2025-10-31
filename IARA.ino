@@ -4,20 +4,21 @@
 #include <ArduinoJson.h>
 
 // Wi-Fi
-const char* ssid = "IARA";
-const char* senha = "IARACYMA";
+const char* ssid = "Dalvanir_TCM";
+const char* senha = "510152030";
 
 // Servidor Flask
-const char* servidor = "https://iara-k3zh.onrender.com";
+//const char* servidor = "https://iara-k3zh.onrender.com";
+const char* servidor = "http://192.168.3.41:5678";
 const char* chave_horta = "f22c19ff-5c18-4d10-9754-5bf030e2c2cc";
 const int HTTP_TIMEOUT = 5000; 
 
 // Pinos
-#define DHTPIN 4
+#define DHTPIN 35
 #define DHTTYPE DHT11
-#define SOIL_PIN 34
+#define SOIL_PIN 33
 #define LED_WIFI 2
-#define PINO_FLUXO 27
+#define PINO_FLUXO 32
 #define PINO_VALVULA 14
 #define LED_VALVULA 26
 #define RELE_IRRIGACAO 5
@@ -32,6 +33,7 @@ volatile int pulsos = 0;
 float litros_irrigados = 0.0;
 float litros_meta = 0;
 bool irrigando = false;
+float litros_enviados = 0.0; // <<< CORREÇÃO: Variável movida para o escopo global
 
 // Mutex para proteger a variável 'pulsos'
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
@@ -172,8 +174,11 @@ void enviarVolumeIrrigado(float litros) {
 void lerESalvarSensores() {
   float temperatura = dht.readTemperature();
   float umidade_ar = dht.readHumidity();
+  //float temperatura = 33.3;
+  //float umidade_ar = 70;
+  
   int valor_bruto = analogRead(SOIL_PIN);
-  int umidade_solo = map(valor_bruto, 0, 4095, 0, 100);
+  int umidade_solo = map(valor_bruto, 0, 4095, 100, 0);
 
   if (!isnan(temperatura) && !isnan(umidade_ar)) {
     // NOVO: Log de leitura dos sensores
@@ -196,7 +201,7 @@ void setup() {
   pinMode(LED_VALVULA, OUTPUT);
   digitalWrite(PINO_VALVULA, LOW);
   digitalWrite(LED_VALVULA, LOW);
-
+  pinMode(SOIL_PIN, INPUT);
   pinMode(LED_WIFI, OUTPUT);
   pinMode(RELE_IRRIGACAO, OUTPUT);
   digitalWrite(LED_WIFI, LOW);
@@ -218,9 +223,9 @@ void loop() {
     }
   } else {
     if (digitalRead(LED_WIFI) == LOW) {
-        Serial.println("[WIFI] Wi-Fi Reconectado!"); // MODIFICADO
-        Serial.print("[WIFI] IP: ");
-        Serial.println(WiFi.localIP());
+       Serial.println("[WIFI] Wi-Fi Reconectado!"); // MODIFICADO
+       Serial.print("[WIFI] IP: ");
+       Serial.println(WiFi.localIP());
     }
     digitalWrite(LED_WIFI, HIGH);
     ultimo_check_wifi = agora; 
@@ -241,7 +246,7 @@ void loop() {
   // --- Fim do Bloco de Log de Status ---
 
 
-  float litros_enviados = 0.0; 
+  // <<< CORREÇÃO: A linha 'float litros_enviados = 0.0;' foi removida daqui
 
   if (!irrigando) {
     litros_meta = obterVolumeAIrrigar();
@@ -252,7 +257,7 @@ void loop() {
       portEXIT_CRITICAL(&mux);
 
       litros_irrigados = 0.0;
-      litros_enviados = 0.0; 
+      litros_enviados = 0.0; // Resetado para 0 no INÍCIO da irrigação
       irrigando = true;
       digitalWrite(PINO_VALVULA, HIGH);
       digitalWrite(LED_VALVULA, HIGH);
@@ -274,7 +279,7 @@ void loop() {
     if (agora - ultimo_envio_irrigado > 5000) { // A cada 5s
       ultimo_envio_irrigado = agora;
       float delta = litros_irrigados - litros_enviados;
-      if (delta >= 0.01) { 
+      if (delta >= 0.1) { 
         enviarVolumeIrrigado(delta); 
         litros_enviados += delta;
       }

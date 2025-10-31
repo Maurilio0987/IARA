@@ -1,7 +1,7 @@
 from supabase import create_client, Client
 import hashlib
-from datetime import datetime, timedelta, date
-
+from datetime import datetime, timedelta, date, timezone
+import pytz
 
 url: str = "https://dphfvmjylwafuptvlqjz.supabase.co"
 key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwaGZ2bWp5bHdhZnVwdHZscWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2OTk3MDMsImV4cCI6MjA2ODI3NTcwM30.A9GIqikHRUCjLVyFlyahOQVvWjD9Z_7gtwUELMAVxcg"  # encurtado para segurança
@@ -367,7 +367,8 @@ class DatabaseManager:
         :param dias: Quantidade de dias anteriores a incluir (ex: 7 para últimos 7 dias).
         :return: Lista de listas no formato [[data_str, volume], ...]
         """
-        hoje = datetime.utcnow().date()
+        tz_fortaleza = pytz.timezone("America/Fortaleza")
+        hoje = hoje = datetime.now(tz_fortaleza).date()
         data_limite = (hoje - timedelta(days=dias - 1)).isoformat()
 
         # Consulta ao Supabase
@@ -379,13 +380,13 @@ class DatabaseManager:
             .execute()
 
         registros = {r['data']: r['consumo'] for r in resposta.data} if resposta.data else {}
-
+      
         resultado = []
         for i in range(dias):
             dia = (hoje - timedelta(days=dias - 1 - i)).isoformat()
             consumo = registros.get(dia, 0)
             resultado.append([dia, consumo])
-
+      
         return resultado
 
   
@@ -423,12 +424,12 @@ class DatabaseManager:
 
     def consumo(self, chave):
         # Primeiro: buscar o valor de "pendente" da tabela "hortas"
-        resp_horta = self.supabase.table("hortas").select("chave, pendente_dia").eq("chave", chave).limit(1).execute()
+        resp_horta = self.supabase.table("hortas").select("chave, pendente_hora").eq("chave", chave).limit(1).execute()
         if not resp_horta.data:
             return (None, None)
-
+        print(resp_horta)
         horta_chave = resp_horta.data[0]["chave"]
-        pendente = resp_horta.data[0]["pendente_dia"]
+        pendente = resp_horta.data[0]["pendente_hora"]
 
         # Segundo: buscar o valor de "consumo" do dia atual da tabela "historico"
         hoje = str(date.today())  # formato: 'YYYY-MM-DD'

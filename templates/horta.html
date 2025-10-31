@@ -143,7 +143,7 @@
             <li><a href="/sobre" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Sobre</a></li>
             <li><a href="/contato" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Contato</a></li>
             <li><a href="/ajuda" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Ajuda</a></li>
-			<li><a href="/hortas" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Voltar para hortas</a></li>
+            <li><a href="/hortas" class="text-white hover:text-emerald-200 transition duration-150 block py-2">Voltar para hortas</a></li>
         </ul>
     </div>
     
@@ -218,15 +218,10 @@
                     <h3 class="text-xl font-semibold text-emerald-800">Consumo de Água</h3>
                     <i class="fas fa-tint text-blue-400 text-xl"></i>
                 </div>
-				<!-- <div class="flex flex-col items-center justify-center">
-                    <div class="text-4xl font-bold text-emerald-600 mb-2"><span id="volume">---</span> L</div>
-                    <p class="text-gray-500 text-sm">Volume pendente</p>
-				</div>
-				<br> <br> -->
                 <div class="flex flex-col items-center justify-center">
                     <div class="text-4xl font-bold text-emerald-600 mb-2"><span id="volume_irrigado">---</span> L</div>
                     <p class="text-gray-500 text-sm">Consumo de hoje</p>
-	        	</div>
+                </div>
             </div>
         </div>
         
@@ -255,9 +250,101 @@
             </div>
         </div>
     </footer>
+
+    <div id="alerta-umidade-toast" class="hidden fixed bottom-5 right-5 w-80 max-w-sm p-4 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out" role="alert">
+        <div class="flex items-center">
+            <div id="alerta-umidade-icon-container" class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center">
+                <i id="alerta-umidade-icon" class="fas fa-lg"></i>
+            </div>
+            <div class="ml-3">
+                <p id="alerta-umidade-titulo" class="font-semibold"></p>
+                <p id="alerta-umidade-msg" class="text-sm"></p>
+            </div>
+            <button type="button" id="alerta-umidade-close-btn" onclick="fecharAlertaUmidade()" class="ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg inline-flex h-8 w-8 focus:outline-none">
+                <span class="sr-only">Fechar</span>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
     <script src="/static/js/horta.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // =============================================
+        // ===== NOVAS FUNÇÕES E VARIÁVEIS (ALERTA) ====
+        // =============================================
+        
+        // Variável para evitar que o alerta pisque sem necessidade
+        let ultimoAlertaStatus = null;
+
+        /**
+         * Esconde o toast de alerta
+         */
+        function fecharAlertaUmidade() {
+            const toast = document.getElementById('alerta-umidade-toast');
+            toast.classList.add('hidden');
+        }
+
+        /**
+         * Exibe e formata o toast de alerta com base no status.
+         * @param {string} status - "baixa", "alta", "ok", ou "desconhecido"
+         */
+        function mostrarAlertaUmidade(status) {
+            const toast = document.getElementById('alerta-umidade-toast');
+            const icon = document.getElementById('alerta-umidade-icon');
+            const iconContainer = document.getElementById('alerta-umidade-icon-container');
+            const titulo = document.getElementById('alerta-umidade-titulo');
+            const msg = document.getElementById('alerta-umidade-msg');
+            const button = document.getElementById('alerta-umidade-close-btn');
+
+            // 1. Se o status não mudou, não faz nada.
+            if (status === ultimoAlertaStatus) {
+                return; 
+            }
+
+            // 2. Se o status for "ok", esconde o toast (caso esteja visível) e para.
+            if (status === 'ok' || status === 'desconhecido') {
+                fecharAlertaUmidade();
+                ultimoAlertaStatus = status; // Armazena que o último estado é "fechado"
+                return;
+            }
+            
+            // Classes base (não mexam)
+            const baseClasses = "hidden fixed bottom-5 right-5 w-80 max-w-sm p-4 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out";
+            const iconBaseClasses = "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center";
+            const buttonBaseClasses = "ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg inline-flex h-8 w-8 focus:outline-none";
+
+            // 3. Configura o toast para o status específico
+            if (status === 'baixa') {
+                titulo.textContent = 'Umidade Baixa';
+                msg.textContent = 'O solo está seco. Rega de emergência será acionada.';
+                
+                // Aplica estilos de "Alerta" (Amarelo)
+                toast.className = `${baseClasses} bg-yellow-100 text-yellow-800`;
+                iconContainer.className = `${iconBaseClasses} bg-yellow-200`;
+                icon.className = 'fas fa-exclamation-triangle fa-lg text-yellow-600';
+                button.className = `${buttonBaseClasses} text-yellow-700 hover:bg-yellow-200`;
+
+            } else if (status === 'alta') {
+                titulo.textContent = 'Umidade Alta';
+                msg.textContent = 'Solo muito úmido. Regas programadas serão suspensas.';
+
+                // Aplica estilos de "Perigo" (Vermelho)
+                toast.className = `${baseClasses} bg-red-100 text-red-800`;
+                iconContainer.className = `${iconBaseClasses} bg-red-200`;
+                icon.className = 'fas fa-exclamation-circle fa-lg text-red-600';
+                button.className = `${buttonBaseClasses} text-red-700 hover:bg-red-200`;
+            }
+
+            // 4. Mostra o toast e atualiza o status
+            toast.classList.remove('hidden');
+            ultimoAlertaStatus = status;
+        }
+
+        // =============================================
+        // =========== FIM DO CÓDIGO DE ALERTA =========
+        // =============================================
+
+
         function updateDateTime() {
             const now = new Date();
             document.getElementById('current-time').textContent = now.toLocaleTimeString();
@@ -274,6 +361,7 @@
             sidebar.classList.toggle('active');
             overlay.classList.toggle('hidden');
         }
+        
         function atualizarSensores(chave) {
             fetch(`/dados/${chave}`, {
                 method: 'GET'
@@ -283,6 +371,12 @@
                 document.getElementById('temperatura').textContent = data.temperatura ?? '---';
                 document.getElementById('umidade_ar').textContent = data.umidade_ar ?? '---';
                 document.getElementById('umidade_solo').textContent = data.umidade_solo ?? '---';
+                
+                // ========================================================
+                // ===== LINHA MODIFICADA: CHAMA A FUNÇÃO DE ALERTA =====
+                // ========================================================
+                mostrarAlertaUmidade(data.alerta_umidade);
+
             })
             .catch(error => {
                 console.error("Erro ao buscar dados dos sensores:", error);
@@ -291,7 +385,7 @@
 
         // Substitua 'SUA_CHAVE' pela variável real da horta
         setInterval(() => atualizarSensores("{{ chave }}"), 5000);
-	
+    
     </script>
 
 </body>
