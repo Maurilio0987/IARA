@@ -12,4 +12,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Acessar a rota de cálculo de consumo da hora
-        run: curl -sSL -X GET "https://iara-k3zh.onrender.com/atualizar_hortas_diario/calcular_consumo_pendente_hora"
+
+        run: curl -sSL -X GET "https://iara-k3zh.onrender.com/calcular_consumo_pendente_hora"
